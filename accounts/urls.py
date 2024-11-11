@@ -7,4 +7,6 @@ urlpatterns = [
     path('logout/', views.logout_user, name='logout'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('delete_account/', views.delete_account, name='delete_account'),  # New URL for account deletion
+    path('spotify_login/', views.spotify_login, name='spotify_login'),
+    path('callback/', views.spotify_callback, name='spotify_callback'),
 ]

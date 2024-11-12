@@ -1,9 +1,13 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html>
 <head>
     <title>Dashboard</title>
+    <link rel="stylesheet" href="{% static 'css/light-theme.css' %}" id="theme-stylesheet">
 </head>
 <body>
+    <button id="toggle-theme">Toggle Dark Mode</button>
     <h2>Welcome to your Dashboard</h2>
     <a href="{% url 'logout' %}">Logout</a>
     <br>
@@ -28,6 +32,22 @@
     {% else %}
         <p>No Spotify wraps saved yet.</p>
     {% endif %}
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const themeToggleButton = document.getElementById('toggle-theme');
+        const themeStylesheet = document.getElementById('theme-stylesheet');
+
+        themeToggleButton.addEventListener('click', () => {
+            const currentTheme = themeStylesheet.getAttribute('href');
+
+            if (currentTheme === '{% static "css/light-theme.css" %}') {
+                themeStylesheet.setAttribute('href', '{% static "css/dark-theme.css" %}');
+            } else {
+                themeStylesheet.setAttribute('href', '{% static "css/light-theme.css" %}');
+            }
+        });
+    });
+    </script>
 </body>
 </html>
-

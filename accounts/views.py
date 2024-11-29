@@ -8,6 +8,7 @@ from django.conf import settings
 import urllib.parse
 import requests
 from .models import UserSpotifyData
+from django.views.decorators.cache import never_cache
 
 def register(request):
     if request.method == 'POST':
@@ -153,7 +154,10 @@ def create_wrapped(request):
     return JsonResponse({'error': 'Failed to fetch Spotify data'}, status=400)
 
 
+import requests
+
 def get_user_top_tracks(access_token):
+    """Fetch user's top tracks from Spotify."""
     api_url = "https://api.spotify.com/v1/me/top/tracks?limit=10"
     headers = {
         "Authorization": f"Bearer {access_token}",
@@ -161,6 +165,24 @@ def get_user_top_tracks(access_token):
     response = requests.get(api_url, headers=headers)
     return response.json()
 
+def get_user_top_artists(access_token):
+    """Fetch user's top artists from Spotify."""
+    api_url = "https://api.spotify.com/v1/me/top/artists?limit=8"
+    headers = {"Authorization": f"Bearer {access_token}"}
+    response = requests.get(api_url, headers=headers)
+    return response.json()
+
+def get_user_top_genres(access_token):
+    """Fetch user's top genres from Spotify."""
+    # Spotify does not provide an endpoint for top genres directly,
+    # but we can infer top genres based on the user's top artists.
+    top_artists = get_user_top_artists(access_token)
+    genres = []
+    for artist in top_artists.get('items', []):
+        genres.extend(artist['genres'])  # Collect genres from the top artists
+    return genres[:5]  # Limit to top 5 genres for simplicity
+
+@never_cache
 @login_required(login_url='login')
 def wrap_detail(request, wrap_id):
     """Display a specific wrap as interactive slides."""
@@ -168,34 +190,36 @@ def wrap_detail(request, wrap_id):
         # Fetch wrap data for the given wrap_id
         wrap = UserSpotifyData.objects.get(user=request.user, id=wrap_id)
         top_tracks = wrap.top_tracks
-        # Example of additional Spotify API calls (e.g., top artists, genres, etc.)
+        
+        # Ensure we have the correct access_token for the logged-in user
         access_token = request.session.get('spotify_access_token')
+        
         if not access_token:
             return redirect('spotify_login')
-        # Get user top artists (adjust API call as needed)
+        
+        # Get user top artists and genres
         top_artists = get_user_top_artists(access_token)
+        top_genres = get_user_top_genres(access_token)
+        
         # Format the top tracks to display them correctly in the template
         formatted_tracks = []
         for track in top_tracks.get('items', [])[:5]:  # Limit to top 5 tracks
             track_name = track['name']
             artists = ', '.join(artist['name'] for artist in track['artists'])  # Join multiple artists
             formatted_tracks.append({'track_name': track_name, 'artists': artists})
+        
         # Prepare data for the template
         context = {
             'wrap_name': wrap.wrap_name,
             'top_tracks': formatted_tracks,  # Use formatted tracks list
             'top_artists': top_artists.get('items', []),  # Extracting artist list
+            'top_genres': top_genres,  # Include top genres list
         }
+        
         return render(request, 'spotify_wrapped/wrap_detail.html', context)
     except UserSpotifyData.DoesNotExist:
         messages.error(request, "Wrap not found.")
         return redirect('dashboard')
-def get_user_top_artists(access_token):
-    """Fetch user's top artists from Spotify."""
-    api_url = "https://api.spotify.com/v1/me/top/artists?limit=8"
-    headers = {"Authorization": f"Bearer {access_token}"}
-    response = requests.get(api_url, headers=headers)
-    return response.json()
 
 
 

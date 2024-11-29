@@ -14,6 +14,9 @@
     <a href="{% url 'delete_account' %}" onclick="return confirm('Are you sure you want to delete your account?');">Delete Account</a>
     <br>
     <a href="{% url 'spotify_login' %}">Login with Spotify</a>
+    <br>
+    <button id="create-wrapped-btn">Create Wrapped</button>
+    <!-- <a href="{% url 'create_wrapped' %}" id="create-wrapped-link">Create Wrapped</button>  -->
 
     <h2>Your Spotify Wraps</h2>
     {% if user_data_list %}
@@ -47,6 +50,32 @@
                 themeStylesheet.setAttribute('href', '{% static "css/light-theme.css" %}');
             }
         });
+
+        const createWrappedLink = document.getElementById('create-wrapped-btn');
+
+        createWrappedLink.addEventListener('click', async function (event) {
+            event.preventDefault();  // Prevent default anchor behavior
+
+            try {
+                const response = await fetch("{% url 'create_wrapped' %}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                    },
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    alert(data.success);  // Success message
+                    location.reload();   // Reload the page to show the new wrap
+                } else {
+                    alert(data.error);   // Error message
+                }
+            } catch (err) {
+                alert('Something went wrong. Please try again.');
+            }
+        });
+
     });
     </script>
 </body>

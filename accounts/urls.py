@@ -9,4 +9,5 @@ urlpatterns = [
     path('delete_account/', views.delete_account, name='delete_account'),  # New URL for account deletion
     path('spotify_login/', views.spotify_login, name='spotify_login'),
     path('callback/', views.spotify_callback, name='spotify_callback'),
+    path('create-wrapped/', views.create_wrapped, name='create_wrapped'),
 ]

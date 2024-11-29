@@ -10,7 +10,6 @@
 <body>
     <div class="wrap-container">
         <h1 class="wrap-title">{{ wrap_name }}</h1>
-
         <div id="slides" class="slides-container">
             <!-- Slide 1: Top Tracks -->
             <div class="slide active">
@@ -24,7 +23,6 @@
                     {% endfor %}
                 </ul>
             </div>
-
             <!-- Slide 2: Top Artists -->
             <div class="slide">
                 <h2 class="section-title">Top Artists</h2>
@@ -34,16 +32,13 @@
                     {% endfor %}
                 </ul>
             </div>
-
             <!-- Add more slides here as needed -->
         </div>
-
         <div class="nav-buttons">
             <button id="prev" class="nav-btn">Previous</button>
             <button id="next" class="nav-btn">Next</button>
         </div>
     </div>
-
     <script src="{% static 'js/wrap_detail.js' %}"></script>
 </body>
 </html>

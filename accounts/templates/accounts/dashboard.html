@@ -51,28 +51,96 @@
             }
         });
 
-        const createWrappedLink = document.getElementById('create-wrapped-btn');
+        // const createWrappedButton = document.getElementById("create-wrapped-btn");
 
-        createWrappedLink.addEventListener('click', async function (event) {
-            event.preventDefault();  // Prevent default anchor behavior
+        // createWrappedButton.addEventListener("click", async function () {
+        //     try {
+        //         // Send POST request to the backend
+        //         const response = await fetch("{% url 'create_wrapped' %}", {
+        //             method: "POST",
+        //             headers: {
+        //                 "X-CSRFToken": "{{ csrf_token }}", // Include CSRF token for security
+        //             },
+        //         });
 
+        //         const data = await response.json();
+
+        //         if (response.ok && data.warning) {
+        //             // Wrap already exists; confirm if the user wants another
+        //             const confirmCreate = confirm(data.warning + " Do you want to create another?");
+        //             if (!confirmCreate) return; // User chose not to create a new wrap
+
+        //             // User confirmed, create a new wrap
+        //             const responseCreate = await fetch("{% url 'create_wrapped' %}", {
+        //                 method: "POST",
+        //                 headers: {
+        //                     "X-CSRFToken": "{{ csrf_token }}",
+        //                 },
+        //             });
+
+        //             const newWrap = await responseCreate.json();
+        //             if (responseCreate.ok) {
+        //                 alert(newWrap.success); // Success message
+        //                 location.reload(); // Reload page to show the new wrap
+        //             } else {
+        //                 alert(newWrap.error); // Error creating wrap
+        //             }
+        //         } else if (response.ok && data.success) {
+        //             // No wraps existed; new wrap created
+        //             alert(data.success);
+        //             location.reload();
+        //         } else {
+        //             // General error handling
+        //             alert(data.error || "Something went wrong. Please try again.");
+        //         }
+        //     } catch (err) {
+        //         alert("Something went wrong. Please try again.");
+        //     }
+        // });
+        const createWrappedButton = document.getElementById("create-wrapped-btn");
+
+        createWrappedButton.addEventListener("click", async function () {
             try {
+                // Initial request to check if a wrap already exists
                 const response = await fetch("{% url 'create_wrapped' %}", {
-                    method: 'POST',
+                    method: "POST",
                     headers: {
-                        'X-CSRFToken': '{{ csrf_token }}',
+                        "X-CSRFToken": "{{ csrf_token }}",
                     },
                 });
 
                 const data = await response.json();
-                if (response.ok) {
-                    alert(data.success);  // Success message
-                    location.reload();   // Reload the page to show the new wrap
+
+                if (response.ok && data.warning) {
+                    // Show confirmation popup
+                    const confirmCreate = confirm(data.warning + " Do you want to create another?");
+                    if (!confirmCreate) return; // User chose not to create another wrap
+
+                    // User confirmed; send second request with `force=true`
+                    const forceResponse = await fetch("{% url 'create_wrapped' %}?force=true", {
+                        method: "POST",
+                        headers: {
+                            "X-CSRFToken": "{{ csrf_token }}",
+                        },
+                    });
+
+                    const forceData = await forceResponse.json();
+                    if (forceResponse.ok && forceData.success) {
+                        alert(forceData.success); // Success message
+                        location.reload();       // Reload page to display new wrap
+                    } else {
+                        alert(forceData.error || "Failed to create a new wrap.");
+                    }
+                } else if (response.ok && data.success) {
+                    // Wrap created successfully without warning
+                    alert(data.success);
+                    location.reload();
                 } else {
-                    alert(data.error);   // Error message
+                    // General error handling
+                    alert(data.error || "Something went wrong. Please try again.");
                 }
             } catch (err) {
-                alert('Something went wrong. Please try again.');
+                alert("Error: " + err.message);
             }
         });
 

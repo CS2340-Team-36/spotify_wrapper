@@ -82,11 +82,14 @@ def delete_account(request):
     messages.success(request, 'Your account has been deleted successfully.')
     return redirect('login')
 
+@login_required
 def spotify_login(request):
     #requests.session.pop('spotify_access_token', None)
-    #request.session.flush()
-    if 'spotify_access_token' in request.session:
-        del request.session['spotify_access_token']
+    # print("Clearing session...")
+    # request.session.flush()
+    # print("Session cleared.")
+    # if 'spotify_access_token' in request.session:
+    #     del request.session['spotify_access_token']
 
     base_url = "https://accounts.spotify.com/authorize"
     params = {
@@ -94,12 +97,15 @@ def spotify_login(request):
         "response_type": "code",
         "redirect_uri": settings.SPOTIFY_REDIRECT_URI,
         "scope": "user-top-read",
+        "show_dialog": "true",
     }
     auth_url = f"{base_url}?{urllib.parse.urlencode(params)}"
     return redirect(auth_url)
 
 def spotify_callback(request):
     code = request.GET.get('code')
+    if not code:
+        return redirect('dashboard')
     token_url = "https://accounts.spotify.com/api/token"
     headers = {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -135,9 +141,38 @@ def spotify_callback(request):
     #return redirect('dashboard')  # Redirect to dashboard or any other page
 
 def create_wrapped(request):
+    # # Check if the user is logged in with Spotify
+    # access_token = request.session.get('spotify_access_token')
+    # if not access_token:
+    #     return JsonResponse({'error': 'Log in with Spotify first'}, status=401)
+
+    # # Check if a wrap already exists for the current user
+    # existing_wraps = UserSpotifyData.objects.filter(user=request.user)
+    # if existing_wraps.exists():
+    #     return JsonResponse({'warning': 'You already have a wrap created for this session.'}, status=200)
+
+    # # If no wraps exist, create a new one
+    # user_top_tracks = get_user_top_tracks(access_token)  # Fetch top tracks from Spotify
+    # if user_top_tracks:
+    #     wrap_name = f"Spotify Wrap {existing_wraps.count() + 1}"
+    #     UserSpotifyData.objects.create(
+    #         user=request.user,
+    #         wrap_name=wrap_name,
+    #         top_tracks=user_top_tracks
+    #     )
+    #     return JsonResponse({'success': 'New wrapped created successfully'})
+
+    # return JsonResponse({'error': 'Failed to fetch Spotify data'}, status=400)
+
     access_token = request.session.get('spotify_access_token')
     if not access_token:
         return JsonResponse({'error': 'Log in with Spotify first'}, status=401)
+
+    force_create = request.GET.get('force', 'false').lower() == 'true'
+
+    existing_wraps = UserSpotifyData.objects.filter(user=request.user)
+    if existing_wraps.exists() and not force_create:
+        return JsonResponse({'warning': 'You already have a wrap created for this session.'}, status=200)
 
     # Generate new wrapped
     user_top_tracks = get_user_top_tracks(access_token)  # Fetch top tracks from Spotify
@@ -151,6 +186,7 @@ def create_wrapped(request):
         return JsonResponse({'success': 'New wrapped created successfully'})
 
     return JsonResponse({'error': 'Failed to fetch Spotify data'}, status=400)
+
 
 
 def get_user_top_tracks(access_token):

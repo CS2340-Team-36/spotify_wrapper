@@ -140,3 +140,15 @@ load_dotenv()
 SPOTIFY_CLIENT_ID = os.getenv('SPOTIFY_CLIENT_ID')
 SPOTIFY_CLIENT_SECRET = os.getenv('SPOTIFY_CLIENT_SECRET')
 SPOTIFY_REDIRECT_URI = os.getenv('SPOTIFY_REDIRECT_URI')
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://accounts.spotify.com',
+]
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Default session engine
+SESSION_COOKIE_AGE = 1209600  # Two weeks (in seconds)
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Prevent session from expiring on browser close
+SESSION_SAVE_EVERY_REQUEST = True  # Save session on every request
+SESSION_COOKIE_SAMESITE = None
+SESSION_COOKIE_SECURE = False
+

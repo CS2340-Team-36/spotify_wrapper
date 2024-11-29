@@ -29,12 +29,14 @@
                             <li>{{ track.name }} by {{ track.artists.0.name }}</li>
                         {% endfor %}
                     </ul>
+                    <a href="{% url 'wrap_detail' data.id %}">View Wrap Details</a>
                 </li>
             {% endfor %}
         </ul>
     {% else %}
         <p>No Spotify wraps saved yet.</p>
     {% endif %}
+
 
     <script>
     document.addEventListener("DOMContentLoaded", function () {

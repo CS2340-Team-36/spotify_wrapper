@@ -1,0 +1,91 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ wrap_name }}</title>
+
+    <!-- Default theme is dark mode -->
+    <link rel="stylesheet" href="{% static 'css/wrap_detail.css' %}" id="theme-stylesheet">  <!-- Dark theme uses wrap_detail.css -->
+    <link rel="stylesheet" href="{% static 'css/light-theme-slides.css' %}" id="light-theme-stylesheet" disabled> <!-- Light theme for slides -->
+
+</head>
+<body>
+    <div class="wrap-container">
+        <!-- Theme toggle button -->
+        <button id="toggle-theme" class="theme-toggle-btn">Toggle Light Mode</button>
+
+        <h1 class="wrap-title">{{ wrap_name }}</h1>
+
+        <div id="slides" class="slides-container">
+            <!-- Slide 1: Top Tracks -->
+            <div class="slide active">
+                <h2 class="section-title">Top Tracks</h2>
+                <ul class="track-list">
+                    {% for track in top_tracks %}
+                        <li class="track-item">
+                            <div class="track-name">{{ track.track_name }}</div>
+                            <div class="track-artists">by {{ track.artists }}</div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- Slide 2: Top Artists -->
+            <div class="slide">
+                <h2 class="section-title">Top Artists</h2>
+                <ul class="artist-list">
+                    {% for artist in top_artists %}
+                        <li class="artist-item">{{ artist.name }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- Slide 3: Top Genres -->
+            <div class="slide">
+                <h2 class="section-title">Top Genres</h2>
+                <ul class="genre-list">
+                    {% for genre in top_genres %}
+                        <li class="genre-item">{{ genre }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- Add more slides here as needed -->
+        </div>
+
+        <div class="nav-buttons">
+            <button id="prev" class="nav-btn">Previous</button>
+            <button id="next" class="nav-btn">Next</button>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const themeToggleButton = document.getElementById('toggle-theme');
+        const themeStylesheet = document.getElementById('theme-stylesheet');
+        const lightThemeStylesheet = document.getElementById('light-theme-stylesheet');
+
+        themeToggleButton.addEventListener('click', () => {
+            const currentTheme = themeStylesheet.getAttribute('href');
+
+            // Toggle between light and dark theme
+            if (currentTheme === '{% static "css/wrap_detail.css" %}') {
+                // Switch to light theme for slides and disable dark theme
+                lightThemeStylesheet.removeAttribute('disabled');
+                themeStylesheet.setAttribute('href', '{% static "css/light-theme-slides.css" %}');
+                themeToggleButton.textContent = "Toggle Dark Mode"; // Update button text
+            } else {
+                // Switch back to dark theme for slides
+                themeStylesheet.setAttribute('href', '{% static "css/wrap_detail.css" %}');
+                lightThemeStylesheet.setAttribute('disabled', 'true');
+                themeToggleButton.textContent = "Toggle Light Mode"; // Update button text
+            }
+        });
+    });
+    </script>
+
+    <script src="{% static 'js/wrap_detail.js' %}"></script>
+</body>
+</html>

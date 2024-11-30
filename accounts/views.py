@@ -258,11 +258,9 @@ def get_user_top_genres(access_token):
 
 
 
-
 @never_cache
 @login_required(login_url='login')
 def wrap_detail(request, wrap_id):
-    """Display a specific wrap as interactive slides, including the lyrics guessing game."""
     try:
         # Fetch wrap data for the given wrap_id
         wrap = UserSpotifyData.objects.get(user=request.user, id=wrap_id)
@@ -278,31 +276,42 @@ def wrap_detail(request, wrap_id):
         top_artists = get_user_top_artists(access_token)
         top_genres = get_user_top_genres(access_token)
 
-        # Format the top tracks to display them correctly in the template
+        # Format the top tracks
         formatted_tracks = []
-        for track in top_tracks.get('items', [])[:5]:  # Limit to top 5 tracks
+        for track in top_tracks.get('items', [])[:5]:
             track_name = track['name']
-            artists = ', '.join(artist['name'] for artist in track['artists'])  # Join multiple artists
+            artists = ', '.join(artist['name'] for artist in track['artists'])
             formatted_tracks.append({'track_name': track_name, 'artists': artists})
 
         # Initialize context with Wrapped data
         context = {
             'wrap_name': wrap.wrap_name,
-            'top_tracks': formatted_tracks,  # Use formatted tracks list
-            'top_artists': top_artists.get('items', []),  # Extracting artist list
-            'top_genres': top_genres,  # Include top genres list
+            'top_tracks': formatted_tracks,
+            'top_artists': top_artists.get('items', []),
+            'top_genres': top_genres,
         }
+
+        # Initialize 'score' in session if not already set
+        if 'score' not in request.session:
+            request.session['score'] = 0
 
         # Lyrics Guessing Game Logic
         if request.method == 'POST':
-            # Handle the user's guess
-            user_guess = request.POST.get('guess')
-            correct_song = request.session.get('correct_song', '').lower()
-
-            if user_guess.lower() == correct_song.lower():
-                context['game_result'] = 'Correct! 🎉'
+            if 'timeout' in request.POST:
+                # User ran out of time
+                context['game_result'] = f"Time's up! The correct answer was {request.session.get('correct_song', '')}."
+                request.session['score'] -= 5  # Deduct points for timeout
             else:
-                context['game_result'] = f'Wrong! The correct answer was {correct_song}.'
+                # Handle the user's guess
+                user_guess = request.POST.get('guess')
+                correct_song = request.session.get('correct_song', '').lower()
+
+                if user_guess.lower() == correct_song.lower():
+                    context['game_result'] = 'Correct! 🎉'
+                    request.session['score'] += 10  # Add 10 points
+                else:
+                    context['game_result'] = f'Wrong! The correct answer was {correct_song}.'
+                    request.session['score'] -= 5  # Deduct 5 points
 
             # Generate a new song for the next game
             selected_track = random.choice(top_tracks.get('items', []))
@@ -344,11 +353,14 @@ def wrap_detail(request, wrap_id):
                 'artist_name': artist_name,
             })
 
+        # Include the score in the context
+        context['score'] = request.session['score']
 
         return render(request, 'spotify_wrapped/wrap_detail.html', context)
 
     except UserSpotifyData.DoesNotExist:
         messages.error(request, "Wrap not found.")
         return redirect('dashboard')
+
 
 

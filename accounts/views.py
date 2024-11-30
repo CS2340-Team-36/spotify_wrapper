@@ -9,6 +9,8 @@ import urllib.parse
 import requests
 from .models import UserSpotifyData
 from django.views.decorators.cache import never_cache
+from .utils import get_lyric_snippet
+import random
 
 def register(request):
     if request.method == 'POST':
@@ -215,44 +217,138 @@ def get_user_top_genres(access_token):
         genres.extend(artist['genres'])  # Collect genres from the top artists
     return genres[:5]  # Limit to top 5 genres for simplicity
 
+# @never_cache
+# @login_required(login_url='login')
+# def wrap_detail(request, wrap_id):
+#     """Display a specific wrap as interactive slides."""
+#     try:
+#         # Fetch wrap data for the given wrap_id
+#         wrap = UserSpotifyData.objects.get(user=request.user, id=wrap_id)
+#         top_tracks = wrap.top_tracks
+        
+#         # Ensure we have the correct access_token for the logged-in user
+#         access_token = request.session.get('spotify_access_token')
+        
+#         if not access_token:
+#             return redirect('spotify_login')
+        
+#         # Get user top artists and genres
+#         top_artists = get_user_top_artists(access_token)
+#         top_genres = get_user_top_genres(access_token)
+        
+#         # Format the top tracks to display them correctly in the template
+#         formatted_tracks = []
+#         for track in top_tracks.get('items', [])[:5]:  # Limit to top 5 tracks
+#             track_name = track['name']
+#             artists = ', '.join(artist['name'] for artist in track['artists'])  # Join multiple artists
+#             formatted_tracks.append({'track_name': track_name, 'artists': artists})
+        
+#         # Prepare data for the template
+#         context = {
+#             'wrap_name': wrap.wrap_name,
+#             'top_tracks': formatted_tracks,  # Use formatted tracks list
+#             'top_artists': top_artists.get('items', []),  # Extracting artist list
+#             'top_genres': top_genres,  # Include top genres list
+#         }
+        
+#         return render(request, 'spotify_wrapped/wrap_detail.html', context)
+#     except UserSpotifyData.DoesNotExist:
+#         messages.error(request, "Wrap not found.")
+#         return redirect('dashboard')
+
+
+
+
 @never_cache
 @login_required(login_url='login')
 def wrap_detail(request, wrap_id):
-    """Display a specific wrap as interactive slides."""
+    """Display a specific wrap as interactive slides, including the lyrics guessing game."""
     try:
         # Fetch wrap data for the given wrap_id
         wrap = UserSpotifyData.objects.get(user=request.user, id=wrap_id)
         top_tracks = wrap.top_tracks
-        
+
         # Ensure we have the correct access_token for the logged-in user
         access_token = request.session.get('spotify_access_token')
-        
+
         if not access_token:
             return redirect('spotify_login')
-        
+
         # Get user top artists and genres
         top_artists = get_user_top_artists(access_token)
         top_genres = get_user_top_genres(access_token)
-        
+
         # Format the top tracks to display them correctly in the template
         formatted_tracks = []
         for track in top_tracks.get('items', [])[:5]:  # Limit to top 5 tracks
             track_name = track['name']
             artists = ', '.join(artist['name'] for artist in track['artists'])  # Join multiple artists
             formatted_tracks.append({'track_name': track_name, 'artists': artists})
-        
-        # Prepare data for the template
+
+        # Initialize context with Wrapped data
         context = {
             'wrap_name': wrap.wrap_name,
             'top_tracks': formatted_tracks,  # Use formatted tracks list
             'top_artists': top_artists.get('items', []),  # Extracting artist list
             'top_genres': top_genres,  # Include top genres list
         }
-        
+
+        # Lyrics Guessing Game Logic
+        if request.method == 'POST':
+            # Handle the user's guess
+            user_guess = request.POST.get('guess')
+            correct_song = request.session.get('correct_song', '').lower()
+
+            if user_guess.lower() == correct_song.lower():
+                context['game_result'] = 'Correct! 🎉'
+            else:
+                context['game_result'] = f'Wrong! The correct answer was {correct_song}.'
+
+            # Generate a new song for the next game
+            selected_track = random.choice(top_tracks.get('items', []))
+            song_name = selected_track['name']
+            artist_name = selected_track['artists'][0]['name']
+            snippet = get_lyric_snippet(song_name, artist_name)
+
+            # Handle case when no lyrics are found
+            if snippet is None:
+                snippet = "Sorry, no lyrics available for this song."
+
+            # Store the correct song name in the session
+            request.session['correct_song'] = song_name
+
+            # Add lyrics game data to context
+            context.update({
+                'snippet': snippet,
+                'artist_name': artist_name,
+            })
+
+        else:
+            # Reset the result on a new question
+            context['game_result'] = None
+            selected_track = random.choice(top_tracks.get('items', []))
+            song_name = selected_track['name']
+            artist_name = selected_track['artists'][0]['name']
+            snippet = get_lyric_snippet(song_name, artist_name)
+
+            # Handle case when no lyrics are found
+            if snippet is None:
+                snippet = "Sorry, no lyrics available for this song."
+
+            # Store the correct song name in the session
+            request.session['correct_song'] = song_name
+
+            # Add lyrics game data to context
+            context.update({
+                'snippet': snippet,
+                'artist_name': artist_name,
+            })
+
+
         return render(request, 'spotify_wrapped/wrap_detail.html', context)
+
     except UserSpotifyData.DoesNotExist:
         messages.error(request, "Wrap not found.")
         return redirect('dashboard')
-
 
 

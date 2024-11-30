@@ -120,3 +120,26 @@ body {
         font-size: 16px;
     }
 }
+
+
+.game-info {
+    position: relative;
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+#timer-bar {
+    height: 10px;
+    width: 100%;
+    background-color: green;
+    transition: width 1s linear; /* Smooth width transition */
+    margin-top: 5px;
+}
+
+#timer {
+    font-weight: bold;
+}
+
+#score {
+    font-weight: bold;
+}

@@ -52,6 +52,44 @@
                 </ul>
             </div>
 
+            <!-- New slide for the Lyrics Guessing Game -->
+            <!-- <div class="slide">
+                <h2>Guess the Song!</h2>
+                <p><strong>Lyric Snippet:</strong> "{{ snippet }}"</p>
+                <p><em>Artist:</em> {{ artist_name }}</p>
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="text" name="guess" placeholder="Enter song name" required>
+                    <button type="submit">Submit</button>
+                </form>
+                {% if game_result %}
+                    <p>{{ game_result }}</p>
+                {% endif %}
+            </div> -->
+           <!-- Lyrics Guessing Game Slide -->
+           <div class="slide">
+            <h2>Guess the Song!</h2>
+        
+            <!-- Timer and Score Section -->
+            <div class="game-info">
+                <p>Time Left: <span id="timer">30</span> seconds</p>
+                <div id="timer-bar"></div> <!-- Timer bar for visual countdown -->
+                <p>Score: <span id="score">{{ score }}</span></p>
+            </div>
+        
+            <p><strong>Lyric Snippet:</strong> "{{ snippet }}"</p>
+            <p><em>Artist:</em> {{ artist_name }}</p>
+            <form method="POST" id="game-form">
+                {% csrf_token %}
+                <input type="text" name="guess" id="guess-input" placeholder="Enter song name" required>
+                <button type="submit">Submit</button>
+            </form>
+            {% if game_result %}
+                <p id="result">{{ game_result }}</p>
+            {% endif %}
+        </div>
+                            
+
             <!-- Add more slides here as needed -->
         </div>
 

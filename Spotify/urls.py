@@ -14,9 +14,27 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.contrib import admin
-from django.urls import path
+from django.conf.urls.i18n import i18n_patterns
+from django.urls import path, include
+from django.views.i18n import set_language
+from django.shortcuts import redirect
+
+
+def default_redirect(request):
+    # Redirect to the default language (e.g., English)
+    return redirect("/en/")
+
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path("", default_redirect, name="default_redirect"),  # Redirect root URL
+    path(
+        "set-language/", set_language, name="set_language"
+    ),  # Optional: for language switching
 ]
+
+urlpatterns += i18n_patterns(
+    path("", include("spotify_wrapped.urls")),  # Include all app-level URLs here
+    path("admin/", admin.site.urls),
+)

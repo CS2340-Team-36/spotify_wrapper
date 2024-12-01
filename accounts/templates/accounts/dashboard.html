@@ -147,6 +147,7 @@
             }
         });
 
+
         const createWrapButtons = document.querySelectorAll('.create-wrap-btn');
 
         createWrapButtons.forEach((button) => {
@@ -169,6 +170,7 @@
                 console.error("Server Error:", errorText);
                 alert("Server error occurred. Check console for details.");
                 return;
+
             }
 
             const data = await response.json();

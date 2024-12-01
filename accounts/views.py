@@ -96,8 +96,7 @@ def spotify_callback(request):
     """Handle Spotify's OAuth callback and exchange code for access token."""
     code = request.GET.get('code')
     if not code:
-        return redirect('dashboard')  # Redirect to dashboard if no code is provided
-
+        return redirect('dashboard')
     token_url = "https://accounts.spotify.com/api/token"
     headers = {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -116,7 +115,6 @@ def spotify_callback(request):
     # Get access and refresh tokens
     access_token = response_data.get('access_token')
     refresh_token = response_data.get('refresh_token')  # May be None if not requested
-
     if not access_token:
         # Handle token retrieval failure
         return JsonResponse({'error': 'Failed to retrieve access token. Please try logging in again.'}, status=401)
@@ -126,7 +124,10 @@ def spotify_callback(request):
     if refresh_token:
         request.session['spotify_refresh_token'] = refresh_token
 
+
+
     return redirect('dashboard')  # Redirect to the dashboard after successful login
+
 
 def refresh_access_token(refresh_token):
     token_url = "https://accounts.spotify.com/api/token"
@@ -135,6 +136,12 @@ def refresh_access_token(refresh_token):
         "refresh_token": refresh_token,
         "client_id": settings.SPOTIFY_CLIENT_ID,
         "client_secret": settings.SPOTIFY_CLIENT_SECRET,
+
+# def get_user_top_tracks(access_token):
+#     """Fetch user's top tracks from Spotify."""
+#     api_url = "https://api.spotify.com/v1/me/top/tracks?limit=10"
+#     headers = {
+#         "Authorization": f"Bearer {access_token}",
     }
 
     response = requests.post(token_url, data=data)
@@ -371,3 +378,4 @@ def wrap_detail(request, wrap_id):
         'top_genres': top_genres,
         'term': term,
     })
+    

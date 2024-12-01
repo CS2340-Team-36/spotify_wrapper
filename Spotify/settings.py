@@ -153,3 +153,12 @@ SESSION_SAVE_EVERY_REQUEST = True  # Save session on every request
 SESSION_COOKIE_SAMESITE = None
 SESSION_COOKIE_SECURE = False
 
+# Email Settings
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # Gmail SMTP server
+EMAIL_PORT = 587  # Gmail SMTP port for TLS
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+EMAIL_HOST_USER = 'group36for2340@gmail.com'
+EMAIL_HOST_PASSWORD = 'yqqa tyhp ookl rijh'
+

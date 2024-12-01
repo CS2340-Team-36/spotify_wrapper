@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact the Developers</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="mb-3">
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary">&larr; Back to Dashboard</a>
+        </div>
+        <h1 class="text-center">Contact the Developers</h1>
+        <hr>
+
+        <!-- Contact Form -->
+        <h2>Send Us Feedback</h2>
+        <form method="POST" action="{% url 'contact_page' %}">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="name" class="form-label">Name</label>
+                <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label">Description</label>
+                <textarea class="form-control" id="description" name="description" rows="5" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+
+        {% if success_message %}
+            <div class="alert alert-success mt-3" role="alert">
+                {{ success_message }}
+            </div>
+        {% endif %}
+
+        <hr>
+
+        <!-- Meet the Developers -->
+        <h2>Meet the Developers</h2>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Manan Khanna</h5>
+                        <p class="card-text">Sophomore at Georgia Tech, loves playing cricket and badminton.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Akshay Bhave</h5>
+                        <p class="card-text">Sophomore at Georgia Tech, hobbies include climbing and playing PS5.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Vasanth Gogineni</h5>
+                        <p class="card-text">Sophomore at Georgia Tech, loves tennis and doing homework.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Jahnavi Manglik</h5>
+                        <p class="card-text">Sophomore at Georgia Tech, loves dancing and MUNs.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Ananya Pattamatta</h5>
+                        <p class="card-text">Sophomore at Georgia Tech, hobbies include reading and singing.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

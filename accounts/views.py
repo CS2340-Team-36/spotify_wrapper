@@ -11,6 +11,8 @@ import requests
 from .models import UserSpotifyData
 from django.views.decorators.cache import never_cache
 import base64
+from django.core.mail import send_mail
+
 
 def register(request):
     if request.method == 'POST':
@@ -379,3 +381,32 @@ def wrap_detail(request, wrap_id):
         'term': term,
     })
     
+
+def contact_page(request):
+    if request.method == "POST":
+        # Get form data
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        description = request.POST.get('description')
+
+
+        # You can store this data or process it here
+        subject = f"Feedback from {name}"
+        message = f"Name: {name}\nEmail: {email}\n\nMessage:\n{description}"
+        from_email = 'group36for2340@gmail.com'  # Sender's email
+        recipient_list = ['group36for2340@gmail.com']  # Recipient's email (same as sender in this case)
+
+
+        # Add a success message (optional)
+        try:
+            # Send the email
+            send_mail(subject, message, from_email, recipient_list)
+            success_message = "Thank you for your feedback! Your message has been sent to the developers."
+        except Exception as e:
+            success_message = "There was an error sending your feedback. Please try again later."
+            print(f"Email Error: {e}")
+            
+        return render(request, 'accounts/contact.html', {'success_message': success_message})
+
+    return render(request, 'accounts/contact.html')
+

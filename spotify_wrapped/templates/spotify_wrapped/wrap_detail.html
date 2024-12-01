@@ -88,11 +88,13 @@
             <div class="slide">
                 <h2 class="section-title">Your Personality Description</h2>
                 <p class="llm-description">
-                    {% if wrap.llm_description %}
-                        {{ wrap.llm_description }}
+                <p>{{ llm_description }}</p>
+
+                    <!-- {% if wrap.llm_description %}
+                        {{ llm_description }}
                     {% else %}
                         No description available. Try generating a new wrap.
-                    {% endif %}
+                    {% endif %} -->
                 </p>
             </div>
 

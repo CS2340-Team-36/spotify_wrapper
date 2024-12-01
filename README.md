@@ -39,7 +39,7 @@ Spotify Wrapped is a web application that allows users to explore and interact w
 ### Installation:
 1. Clone the repository:
 ```sh
-git clone https://github.com/your-repo/spotify-wrapped.git](https://github.com/CS2340-Team-36/spotify_wrapper.git
+git clone https://github.com/CS2340-Team-36/spotify_wrapper.git
 ```
 
 2. Install dependencies:

@@ -158,3 +158,36 @@ body {
 #score {
     font-weight: bold;
 }
+
+.social-share-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.social-button {
+    display: inline-block;
+    margin: 10px;
+    padding: 10px 20px;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.facebook-button {
+    background-color: #3b5998;
+}
+
+.whatsapp-button {
+    background-color: #25D366;
+}
+
+.linkedin-button {
+    background-color: #0077b5;
+}
+
+.social-button:hover {
+    opacity: 0.8;
+}

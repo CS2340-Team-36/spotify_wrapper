@@ -10,6 +10,7 @@ Spotify Wrapped is a web application that allows users to explore and interact w
 ### A. User Authentication
 - Users can create an account and log in to access personalized features such as saving and viewing past Spotify wraps.
 - Users can log out, and their account information is persisted after exiting the website.
+- Users can creatr wraps from different spotify accounts withint he same local account
 - Users can delete their account and their wraps.
 
 ### B. Spotify Wrap Generation
@@ -27,30 +28,6 @@ Spotify Wrapped is a web application that allows users to explore and interact w
 
 ### F. Social Media Sharing
 - Users can easily share their Spotify Wrapped on social media platforms like Instagram, LinkedIn, and X (formerly Twitter).
-
-## Base User Stories:
-1. **As a user, I want to be able to view a presentation of the different aspects of my personal Spotify music listening tastes displayed in colorful and fun ways.**
-    - Acceptance Criteria:
-        - Able to parse through a Spotify account’s data to generate a detailed and creative summary of the user’s music listening habits and tastes.
-        - Summary must consist of at least 8 distinct “slides” (transition slides count and are encouraged).
-
-2. **As a user, I would like to be able to create and login to an account that saves my previously generated Spotify wraps.**
-    - Acceptance Criteria:
-        - Able to create and log into an account associated with your Spotify info.
-        - Able to log out of your account.
-        - Account information is persistent (exists after exiting the website).
-        - Provide a screen where past Spotify wraps (the entire wrap, not just a summary) can be accessed, viewed, and deleted.
-        - Provide a screen where you can delete your account.
-
-3. **As a user, I would like the UI to be aesthetically-pleasing and responsive.**
-    - Acceptance Criteria:
-        - UI matches client design tastes and expectations.
-        - UI displays correctly on different laptop/monitor sizes (not hardcoded).
-
-4. **As a developer, I would like to avoid security leaks by not hosting secrets like API keys on GitHub.**
-    - Acceptance Criteria:
-        - No secrets should be committed to GitHub.
-        - Store all secrets in a file that is added to your `.gitignore` to prevent accidental commits.
 
 
 ## Project Setup
@@ -102,16 +79,13 @@ python manage.py runserver
 [CSS.com]: https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3
 [CSS-url]: https://developer.mozilla.org/en-US/docs/Web/CSS
 
-[TailwindCSS.com]: https://img.shields.io/badge/TailwindCSS-38B2AC?style=for-the-badge&logo=tailwind-css
-[TailwindCSS-url]: https://tailwindcss.com/
-
 [Python.org]: https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python
 [Python-url]: https://www.python.org/
 
 ## Links:
-1. Team Website: https://ananyapattamatta7.wixstudio.io/atl-food-team36
-2. GitHub Repository: https://github.com/CS2340-Team-36/atlanta_food_finder
-3. Kanban Board: https://trello.com/b/8RSIMMko
+1. Team Website: 
+2. GitHub Repository: 
+3. Kanban Board:
 
 
 ## Contributors:

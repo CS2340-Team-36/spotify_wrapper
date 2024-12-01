@@ -2,3 +2,10 @@ body {
     background-color: #121212;
     color: white;
 }
+
+@media (max-width: 768px) {
+    .track-item,
+    .artist-item {
+        font-size: 14px;
+    }
+}

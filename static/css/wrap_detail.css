@@ -1,14 +1,14 @@
 /* Global styles to match Spotify's dark theme */
 body {
     font-family: 'Helvetica Neue', sans-serif;
-    background-color: #121212;
-    color: white;
+    background-color: #f0f0f0;
+    color: black;
     margin: 0;
     padding: 0;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
-    height: 100vh;
+    height: 100%;
 }
 
 /* Centering the wrap container */
@@ -65,21 +65,24 @@ body {
 }
 
 .nav-buttons {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 30px;
-    width: 100%; /* Ensures the buttons stretch across the container */
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+.nav-buttons {
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
 }
 
 .nav-btn {
+    font-size: 16px;
+    padding: 12px;
+    border-radius: 8px;
     background-color: #1db954;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    font-size: 18px;
     cursor: pointer;
-    border-radius: 30px;
     transition: background-color 0.2s;
+
 }
 
 .nav-btn:hover {
@@ -88,6 +91,21 @@ body {
 
 .nav-btn:focus {
     outline: none;
+}
+
+
+/* Desktop adjustments */
+@media (min-width: 768px) {
+    .nav-buttons {
+        flex-direction: row;
+        justify-content: space-between;
+        width: auto;
+    }
+
+    .nav-btn {
+        font-size: 18px;
+        padding: 10px 20px;
+    }
 }
 
 /* Slide transitions */
@@ -140,15 +158,26 @@ body {
 .game-info {
     position: relative;
     margin-bottom: 15px;
-    font-size: 18px;
+    font-size: 16px;
+    padding: 10px;
 }
 
 #timer-bar {
-    height: 10px;
+    height: 5px; /* Thinner timer bar */
     width: 100%;
     background-color: green;
     transition: width 1s linear; /* Smooth width transition */
     margin-top: 5px;
+}
+
+@media (min-width: 768px) {
+    .game-info {
+        font-size: 18px;
+    }
+
+    #timer-bar {
+        height: 10px; /* Larger timer bar */
+    }
 }
 
 #timer {
@@ -226,4 +255,25 @@ body {
 .artist-item.active {
     opacity: 1; /* Fade-in */
     transform: translateX(0); /* Slide-in */
+}
+
+.genre-list-container,
+.artist-list {
+    display: flex;
+    overflow-x: auto; /* Enable horizontal scrolling */
+    gap: 10px;
+    padding: 10px;
+}
+
+@media (min-width: 768px) {
+    body {
+        flex-direction: row;
+        justify-content: center;
+        height: 100vh;
+    }
+    .genre-list-container,
+    .artist-list {
+        flex-wrap: wrap; /* Allow wrapping on larger screens */
+        gap: 20px;
+    }
 }

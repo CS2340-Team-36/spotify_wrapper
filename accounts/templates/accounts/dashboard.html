@@ -166,41 +166,148 @@
             }
         });
 
-
         const createWrapButtons = document.querySelectorAll('.create-wrap-btn');
 
-        createWrapButtons.forEach((button) => {
-    button.addEventListener('click', async function () {
-        const term = button.getAttribute('data-term');
-        const formData = new FormData();
-        formData.append('term', term);
+    createWrapButtons.forEach((button) => {
+        button.addEventListener('click', async function () {
+            const term = button.getAttribute('data-term');
+            const formData = new FormData();
+            formData.append('term', term);
 
-        try {
-            const response = await fetch("{% url 'create_wrapped' %}", {
-                method: "POST",
-                headers: {
-                    "X-CSRFToken": "{{ csrf_token }}",
-                },
-                body: formData,  // Use FormData to send data as form-encoded
-            });
+            try {
+                const response = await fetch("{% url 'create_wrapped' %}", {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": "{{ csrf_token }}",
+                    },
+                    body: formData,
+                });
 
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error("Server Error:", errorText);
-                alert("Server error occurred. Check console for details.");
-                return;
+                // Parse the JSON response
+                const data = await response.json();
 
+                // Handle warning scenario
+                if (data.warning) {
+                    const userConfirmed = confirm(data.warning);
+                    if (!userConfirmed) {
+                        // User canceled, do not proceed
+                        return;
+                    }
+
+                    // Add 'confirmed' flag to the form data
+                    formData.append('confirmed', 'true');
+
+                    // Retry the request if user confirms
+                    const retryResponse = await fetch("{% url 'create_wrapped' %}", {
+                        method: "POST",
+                        headers: {
+                            "X-CSRFToken": "{{ csrf_token }}",
+                        },
+                        body: formData,
+                    });
+
+                    const retryData = await retryResponse.json();
+                    alert(retryData.success || retryData.error || "Unknown response.");
+                } else {
+                    // Handle success or error
+                    alert(data.success || data.error || "Unknown response.");
+                }
+                location.reload();
+            } catch (err) {
+                console.error("Error:", err);
+                alert("A network or server error occurred. Please check the console for details.");
             }
-
-            const data = await response.json();
-            alert(data.success || data.error || "Unknown response.");
-            location.reload();
-        } catch (err) {
-            console.error("Error:", err);
-            alert("Error: " + err.message);
-        }
+        });
     });
-});
+        // non working but stil popping
+    //     const createWrapButtons = document.querySelectorAll('.create-wrap-btn');
+
+    // createWrapButtons.forEach((button) => {
+    //     button.addEventListener('click', async function () {
+    //         const term = button.getAttribute('data-term');
+    //         const formData = new FormData();
+    //         formData.append('term', term);
+
+    //         try {
+    //             const response = await fetch("{% url 'create_wrapped' %}", {
+    //                 method: "POST",
+    //                 headers: {
+    //                     "X-CSRFToken": "{{ csrf_token }}",
+    //                 },
+    //                 body: formData,
+    //             });
+
+    //             // Parse the JSON response
+    //             const data = await response.json();
+
+    //             // Handle warning scenario
+    //             if (data.warning) {
+    //                 const userConfirmed = confirm(data.warning);
+    //                 if (!userConfirmed) {
+    //                     // User canceled, do not proceed
+    //                     return;
+    //                 }
+
+    //                 // Retry the request if user confirms
+    //                 const retryResponse = await fetch("{% url 'create_wrapped' %}", {
+    //                     method: "POST",
+    //                     headers: {
+    //                         "X-CSRFToken": "{{ csrf_token }}",
+    //                     },
+    //                     body: formData,
+    //                 });
+
+    //                 const retryData = await retryResponse.json();
+    //                 alert(retryData.success || retryData.error || "Unknown response.");
+    //             } else {
+    //                 // Handle success or error
+    //                 alert(data.success || data.error || "Unknown response.");
+    //             }
+    //         } catch (err) {
+    //             console.error("Error:", err);
+    //             alert("A network or server error occurred. Please check the console for details.");
+    //         }
+    //     });
+    // });
+
+
+
+//safety
+
+//         const createWrapButtons = document.querySelectorAll('.create-wrap-btn');
+
+//         createWrapButtons.forEach((button) => {
+//     button.addEventListener('click', async function () {
+//         const term = button.getAttribute('data-term');
+//         const formData = new FormData();
+//         formData.append('term', term);
+
+//         try {
+//             const response = await fetch("{% url 'create_wrapped' %}", {
+//                 method: "POST",
+//                 headers: {
+//                     "X-CSRFToken": "{{ csrf_token }}",
+//                 },
+//                 body: formData,  // Use FormData to send data as form-encoded
+//             });
+
+//             if (!response.ok) {
+//                 const errorText = await response.text();
+//                 console.error("Server Error:", errorText);
+//                 alert("Server error occurred. Check console for details.");
+//                 return;
+
+//             }
+
+//             const data = await response.json();
+//             alert(data.success || data.error || "Unknown response.");
+//             location.reload();
+//         } catch (err) {
+//             console.error("Error:", err);
+//             alert("Error: " + err.message);
+//         }
+//     });
+// });
 
     });
     </script>

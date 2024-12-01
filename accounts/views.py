@@ -292,7 +292,7 @@ def create_wrapped(request):
         top_artists = process_top_artists(top_artists_data)
 
         # Collect all the genres (pass the term for time-range)
-        top_genres = get_user_top_genres(access_token, term)
+        top_genres = process_top_genres(access_token, term)
 
         # Step 5: Save the wrap data to the database
         try:
@@ -342,7 +342,7 @@ def process_top_tracks(data):
 def process_top_artists(data):
     return [artist['name'] for artist in data.get('items', [])]
 
-def get_user_top_genres(access_token, term):
+def process_top_genres(access_token, term):
     url = f'https://api.spotify.com/v1/me/top/artists?limit=50&time_range={term}'
     headers = {'Authorization': f'Bearer {access_token}'}
     response = requests.get(url, headers=headers)

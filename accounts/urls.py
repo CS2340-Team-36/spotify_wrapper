@@ -11,4 +11,5 @@ urlpatterns = [
     path('callback/', views.spotify_callback, name='spotify_callback'),
     path('create-wrapped/', views.create_wrapped, name='create_wrapped'),
     path('wrap/<int:wrap_id>/', views.wrap_detail, name='wrap_detail'),
+    path('contact/', views.contact_page, name='contact_page'),
 ]

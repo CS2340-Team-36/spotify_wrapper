@@ -8,17 +8,31 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function showSlide(index) {
         slides.forEach((slide, i) => {
-            slide.classList.toggle('active', i === index);
-
-            // If the game slide is active, start the timer
-            if (slide.querySelector('.game-info') && i === index) {
-                resetTimer();
+            if (i === index) {
+                // Activate the current slide
+                slide.classList.add('active');
+                slide.style.opacity = "1"; // Fade-in effect
+                slide.style.transform = "translateX(0)"; // Ensure the slide is fully visible
+    
+                // If the slide contains a game, start the timer
+                if (slide.querySelector('.game-info')) {
+                    resetTimer();
+                }
             } else {
-                clearInterval(timer);
-                resetTimerBar();
+                // Deactivate other slides
+                slide.style.opacity = "0"; // Fade-out effect
+                slide.style.transform = "translateX(100%)"; // Move slide out of view
+                setTimeout(() => slide.classList.remove('active'), 500); // Match transition duration
+    
+                // Clear timer for non-active slides
+                if (slide.querySelector('.game-info')) {
+                    clearInterval(timer);
+                    resetTimerBar();
+                }
             }
         });
-
+    
+        // Update session storage
         sessionStorage.setItem('currentSlide', index);
     }
 

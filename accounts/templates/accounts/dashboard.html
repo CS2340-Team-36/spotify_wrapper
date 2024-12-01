@@ -73,11 +73,11 @@
                     {% for data in short_term_wraps %}
                         <li>
                             <strong>{{ data.wrap_name }}</strong>
-                            <ul>
+                            <!-- <ul>
                                 {% for track in data.top_tracks.items %}
                                     <li>{{ track.name }} by {{ track.artists.0.name }}</li>
                                 {% endfor %}
-                            </ul>
+                            </ul> -->
                             <a href="{% url 'wrap_detail' data.id %}">View Wrap Details</a>
                         </li>
                     {% endfor %}
@@ -96,11 +96,11 @@
                     {% for data in medium_term_wraps %}
                         <li>
                             <strong>{{ data.wrap_name }}</strong>
-                            <ul>
+                            <!-- <ul>
                                 {% for track in data.top_tracks.items %}
                                     <li>{{ track.name }} by {{ track.artists.0.name }}</li>
                                 {% endfor %}
-                            </ul>
+                            </ul> -->
                             <a href="{% url 'wrap_detail' data.id %}">View Wrap Details</a>
                         </li>
                     {% endfor %}
@@ -119,11 +119,11 @@
                     {% for data in long_term_wraps %}
                         <li>
                             <strong>{{ data.wrap_name }}</strong>
-                            <ul>
+                            <!-- <ul>
                                 {% for track in data.top_tracks.items %}
                                     <li>{{ track.name }} by {{ track.artists.0.name }}</li>
                                 {% endfor %}
-                            </ul>
+                            </ul> -->
                             <a href="{% url 'wrap_detail' data.id %}">View Wrap Details</a>
                         </li>
                     {% endfor %}

@@ -4,12 +4,15 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
+import json
 from django.conf import settings
 import urllib.parse
 import requests
 from .models import UserSpotifyData
 from django.views.decorators.cache import never_cache
+import base64
 from django.core.mail import send_mail
+
 
 def register(request):
     if request.method == 'POST':
@@ -51,30 +54,24 @@ def logout_user(request):
     logout(request)
     return redirect('login')
 
-@login_required(login_url='login')
+@login_required
 def dashboard(request):
-    """Display user's dashboard with Spotify wraps."""
-    # Fetch all previously stored wraps for the user
-    user_data_list = UserSpotifyData.objects.filter(user=request.user)
+    access_token = request.session.get('spotify_access_token')
+    if not access_token:
+        messages.error(request, "Spotify access token is missing. Please log in with Spotify again.")
+        return redirect('spotify_login')
 
-    # Show wraps if they exist
-    return render(request, 'accounts/dashboard.html', {'user_data_list': user_data_list})
+    # Fetch and display wraps
+    user = request.user
+    short_term_wraps = UserSpotifyData.objects.filter(user=user, term='short_term')
+    medium_term_wraps = UserSpotifyData.objects.filter(user=user, term='medium_term')
+    long_term_wraps = UserSpotifyData.objects.filter(user=user, term='long_term')
 
-    # user_data_list = []
-    # if request.user.is_authenticated:
-    #     access_token = request.session.get('spotify_access_token')
-    #     if access_token:
-    #         top_tracks = get_user_top_tracks(access_token)
-
-    #         # Save data if needed
-    #         user_data = UserSpotifyData.objects.create(
-    #             user=request.user,
-    #             wrap_name="Latest Wrap",
-    #             top_tracks=top_tracks,
-    #         )
-    #         user_data_list = UserSpotifyData.objects.filter(user=request.user)
-
-    # return render(request, 'accounts/dashboard.html', {'user_data_list': user_data_list})
+    return render(request, 'accounts/dashboard.html', {
+        'short_term_wraps': short_term_wraps,
+        'medium_term_wraps': medium_term_wraps,
+        'long_term_wraps': long_term_wraps,
+    })
 
 @login_required(login_url='login')
 def delete_account(request):
@@ -86,13 +83,6 @@ def delete_account(request):
 
 @login_required
 def spotify_login(request):
-    #requests.session.pop('spotify_access_token', None)
-    # print("Clearing session...")
-    # request.session.flush()
-    # print("Session cleared.")
-    # if 'spotify_access_token' in request.session:
-    #     del request.session['spotify_access_token']
-
     base_url = "https://accounts.spotify.com/authorize"
     params = {
         "client_id": settings.SPOTIFY_CLIENT_ID,
@@ -105,6 +95,7 @@ def spotify_login(request):
     return redirect(auth_url)
 
 def spotify_callback(request):
+    """Handle Spotify's OAuth callback and exchange code for access token."""
     code = request.GET.get('code')
     if not code:
         return redirect('dashboard')
@@ -122,139 +113,274 @@ def spotify_callback(request):
 
     response = requests.post(token_url, headers=headers, data=data)
     response_data = response.json()
+
+    # Get access and refresh tokens
     access_token = response_data.get('access_token')
-
-    # Save access token to the session
-    request.session['spotify_access_token'] = access_token
-    # if request.user.is_authenticated:
-    #     top_tracks = get_user_top_tracks(access_token)
-    #     if top_tracks:
-    #         wrap_name = f"Spotify Wrap {UserSpotifyData.objects.filter(user=request.user).count() + 1}"
-    #         UserSpotifyData.objects.create(
-    #             user=request.user,
-    #             wrap_name=wrap_name,
-    #             top_tracks=top_tracks,
-    #         )
-
-    return redirect('dashboard')
-    # Pass user statistics to the template
-    #return render(request, 'accounts/dashboard.html', {'user_top_tracks': user_top_tracks})
-
-    #return redirect('dashboard')  # Redirect to dashboard or any other page
-
-def create_wrapped(request):
-    # # Check if the user is logged in with Spotify
-    # access_token = request.session.get('spotify_access_token')
-    # if not access_token:
-    #     return JsonResponse({'error': 'Log in with Spotify first'}, status=401)
-
-    # # Check if a wrap already exists for the current user
-    # existing_wraps = UserSpotifyData.objects.filter(user=request.user)
-    # if existing_wraps.exists():
-    #     return JsonResponse({'warning': 'You already have a wrap created for this session.'}, status=200)
-
-    # # If no wraps exist, create a new one
-    # user_top_tracks = get_user_top_tracks(access_token)  # Fetch top tracks from Spotify
-    # if user_top_tracks:
-    #     wrap_name = f"Spotify Wrap {existing_wraps.count() + 1}"
-    #     UserSpotifyData.objects.create(
-    #         user=request.user,
-    #         wrap_name=wrap_name,
-    #         top_tracks=user_top_tracks
-    #     )
-    #     return JsonResponse({'success': 'New wrapped created successfully'})
-
-    # return JsonResponse({'error': 'Failed to fetch Spotify data'}, status=400)
-
-    access_token = request.session.get('spotify_access_token')
+    refresh_token = response_data.get('refresh_token')  # May be None if not requested
     if not access_token:
-        return JsonResponse({'error': 'Log in with Spotify first'}, status=401)
+        # Handle token retrieval failure
+        return JsonResponse({'error': 'Failed to retrieve access token. Please try logging in again.'}, status=401)
 
-    force_create = request.GET.get('force', 'false').lower() == 'true'
-
-    existing_wraps = UserSpotifyData.objects.filter(user=request.user)
-    if existing_wraps.exists() and not force_create:
-        return JsonResponse({'warning': 'You already have a wrap created for this session.'}, status=200)
-
-    # Generate new wrapped
-    user_top_tracks = get_user_top_tracks(access_token)  # Fetch top tracks from Spotify
-    if user_top_tracks:
-        wrap_name = f"Spotify Wrap {UserSpotifyData.objects.filter(user=request.user).count() + 1}"
-        UserSpotifyData.objects.create(
-            user=request.user,
-            wrap_name=wrap_name,
-            top_tracks=user_top_tracks
-        )
-        return JsonResponse({'success': 'New wrapped created successfully'})
-
-    return JsonResponse({'error': 'Failed to fetch Spotify data'}, status=400)
+    # Save tokens to session
+    request.session['spotify_access_token'] = access_token
+    if refresh_token:
+        request.session['spotify_refresh_token'] = refresh_token
 
 
-def get_user_top_tracks(access_token):
-    """Fetch user's top tracks from Spotify."""
-    api_url = "https://api.spotify.com/v1/me/top/tracks?limit=10"
-    headers = {
-        "Authorization": f"Bearer {access_token}",
+
+    return redirect('dashboard')  # Redirect to the dashboard after successful login
+
+
+def refresh_access_token(refresh_token):
+    token_url = "https://accounts.spotify.com/api/token"
+    data = {
+        "grant_type": "refresh_token",
+        "refresh_token": refresh_token,
+        "client_id": settings.SPOTIFY_CLIENT_ID,
+        "client_secret": settings.SPOTIFY_CLIENT_SECRET,
+
+# def get_user_top_tracks(access_token):
+#     """Fetch user's top tracks from Spotify."""
+#     api_url = "https://api.spotify.com/v1/me/top/tracks?limit=10"
+#     headers = {
+#         "Authorization": f"Bearer {access_token}",
     }
-    response = requests.get(api_url, headers=headers)
-    return response.json()
 
-def get_user_top_artists(access_token):
-    """Fetch user's top artists from Spotify."""
-    api_url = "https://api.spotify.com/v1/me/top/artists?limit=8"
-    headers = {"Authorization": f"Bearer {access_token}"}
-    response = requests.get(api_url, headers=headers)
-    return response.json()
+    response = requests.post(token_url, data=data)
+    if response.status_code == 200:
+        return response.json().get('access_token')
+    return None
 
-def get_user_top_genres(access_token):
-    """Fetch user's top genres from Spotify."""
-    # Spotify does not provide an endpoint for top genres directly,
-    # but we can infer top genres based on the user's top artists.
-    top_artists = get_user_top_artists(access_token)
-    genres = []
-    for artist in top_artists.get('items', []):
-        genres.extend(artist['genres'])  # Collect genres from the top artists
-    return genres[:5]  # Limit to top 5 genres for simplicity
+# @login_required
+# def create_wrapped(request):
+#     if not request.user.is_authenticated:
+#         return JsonResponse({'error': 'User not authenticated'}, status=401)
+    
+#     if request.method == 'POST':
+#         # Step 1: Fetch Spotify data (replace with actual access token for authenticated user)
+#         access_token = request.session.get('spotify_access_token')
+#         refresh_token = request.session.get('spotify_refresh_token')  # Get the refresh token if available
+#         if not access_token:
+#             return JsonResponse({'error': 'No Spotify token found for the user. Please authenticate with Spotify.'}, status=401)
 
-@never_cache
-@login_required(login_url='login')
-def wrap_detail(request, wrap_id):
-    """Display a specific wrap as interactive slides."""
-    try:
-        # Fetch wrap data for the given wrap_id
-        wrap = UserSpotifyData.objects.get(user=request.user, id=wrap_id)
-        top_tracks = wrap.top_tracks
-        
-        # Ensure we have the correct access_token for the logged-in user
+#         headers = {
+#             'Authorization': f'Bearer {access_token}',
+#         }
+
+#         # Fetch top tracks and top artists (limit 10)
+#         top_tracks_url = 'https://api.spotify.com/v1/me/top/tracks?limit=10'
+#         top_artists_url = 'https://api.spotify.com/v1/me/top/artists?limit=10'
+
+#         # Step 2: Try fetching top tracks and top artists
+#         top_tracks_response = requests.get(top_tracks_url, headers=headers)
+#         top_artists_response = requests.get(top_artists_url, headers=headers)
+
+#         # Check for token expiration
+#         if top_tracks_response.status_code == 401 and 'expired' in top_tracks_response.text:
+#             # Token expired, try refreshing it
+#             new_access_token = refresh_spotify_token(refresh_token)
+#             if not new_access_token:
+#                 return JsonResponse({'error': 'Error refreshing Spotify token.'}, status=500)
+            
+#             # Save the new access token in the session
+#             request.session['spotify_access_token'] = new_access_token
+#             headers['Authorization'] = f'Bearer {new_access_token}'  # Update the headers with the new access token
+
+#             # Retry the API requests with the new token
+#             top_tracks_response = requests.get(top_tracks_url, headers=headers)
+#             top_artists_response = requests.get(top_artists_url, headers=headers)
+
+#         if top_tracks_response.status_code != 200:
+#             return JsonResponse({'error': 'Error fetching top tracks from Spotify API.'}, status=500)
+#         if top_artists_response.status_code != 200:
+#             return JsonResponse({'error': 'Error fetching top artists from Spotify API.'}, status=500)
+
+#         # Step 3: Process the data
+#         top_tracks_data = top_tracks_response.json()  # Parse the JSON response for top tracks
+#         top_artists_data = top_artists_response.json()  # Parse the JSON response for top artists
+
+#         if not top_tracks_data.get('items') or not top_artists_data.get('items'):
+#             return JsonResponse({'error': 'No top tracks or artists found.'}, status=404)
+
+#         top_tracks = process_top_tracks(top_tracks_data)
+#         top_artists = process_top_artists(top_artists_data)
+
+#         # Collect all the genres
+#         top_genres = get_user_top_genres(access_token, 'short_term')
+
+#         # Determine the term (short, medium, or long)
+#         term = request.POST.get('term', 'short_term')
+#         if term not in ['short_term', 'medium_term', 'long_term']:
+#             return JsonResponse({'error': 'Invalid term specified. Must be one of: short_term, medium_term, long_term.'}, status=400)
+
+#         # Save the wrap data to the database
+#         try:
+#             wrap_name = f"{term.replace('_', ' ').title()} Wrap {UserSpotifyData.objects.filter(user=request.user, term=term).count() + 1}"
+#             wrap = UserSpotifyData.objects.create(
+#                 user=request.user,
+#                 wrap_name=wrap_name,
+#                 top_tracks=top_tracks,
+#                 top_artists=top_artists,
+#                 term=term,
+#                 top_genres=top_genres
+#             )
+#             return JsonResponse({'success': f'{wrap_name} created successfully.'})
+
+#         except Exception as e:
+#             return JsonResponse({'error': f'Error saving wrap: {str(e)}'}, status=500)
+
+#     else:
+#         return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+@login_required
+def create_wrapped(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'User not authenticated'}, status=401)
+    
+    if request.method == 'POST':
+        # Step 1: Fetch Spotify data (replace with actual access token for authenticated user)
         access_token = request.session.get('spotify_access_token')
-        
+        refresh_token = request.session.get('spotify_refresh_token')  # Get the refresh token if available
         if not access_token:
-            return redirect('spotify_login')
-        
-        # Get user top artists and genres
-        top_artists = get_user_top_artists(access_token)
-        top_genres = get_user_top_genres(access_token)
-        
-        # Format the top tracks to display them correctly in the template
-        formatted_tracks = []
-        for track in top_tracks.get('items', [])[:5]:  # Limit to top 5 tracks
-            track_name = track['name']
-            artists = ', '.join(artist['name'] for artist in track['artists'])  # Join multiple artists
-            formatted_tracks.append({'track_name': track_name, 'artists': artists})
-        
-        # Prepare data for the template
-        context = {
-            'wrap_name': wrap.wrap_name,
-            'top_tracks': formatted_tracks,  # Use formatted tracks list
-            'top_artists': top_artists.get('items', []),  # Extracting artist list
-            'top_genres': top_genres,  # Include top genres list
-        }
-        
-        return render(request, 'spotify_wrapped/wrap_detail.html', context)
-    except UserSpotifyData.DoesNotExist:
-        messages.error(request, "Wrap not found.")
-        return redirect('dashboard')
+            return JsonResponse({'error': 'No Spotify token found for the user. Please authenticate with Spotify.'}, status=401)
 
+        headers = {
+            'Authorization': f'Bearer {access_token}',
+        }
+
+        # Step 2: Determine the term (short_term, medium_term, long_term)
+        term = request.POST.get('term')
+        if term not in ['short_term', 'medium_term', 'long_term']:
+            return JsonResponse({'error': 'Invalid term specified. Must be one of: short_term, medium_term, long_term.'}, status=400)
+        
+        # Fetch top tracks and top artists based on the selected time frame
+        top_tracks_url = f'https://api.spotify.com/v1/me/top/tracks?limit=10&time_range={term}'
+        top_artists_url = f'https://api.spotify.com/v1/me/top/artists?limit=10&time_range={term}'
+
+        # Step 3: Try fetching top tracks and top artists
+        top_tracks_response = requests.get(top_tracks_url, headers=headers)
+        top_artists_response = requests.get(top_artists_url, headers=headers)
+
+        # Check for token expiration
+        if top_tracks_response.status_code == 401 and 'expired' in top_tracks_response.text:
+            # Token expired, try refreshing it
+            new_access_token = refresh_spotify_token(refresh_token)
+            if not new_access_token:
+                return JsonResponse({'error': 'Error refreshing Spotify token.'}, status=500)
+            
+            # Save the new access token in the session
+            request.session['spotify_access_token'] = new_access_token
+            headers['Authorization'] = f'Bearer {new_access_token}'  # Update the headers with the new access token
+
+            # Retry the API requests with the new token
+            top_tracks_response = requests.get(top_tracks_url, headers=headers)
+            top_artists_response = requests.get(top_artists_url, headers=headers)
+
+        if top_tracks_response.status_code != 200:
+            return JsonResponse({'error': 'Error fetching top tracks from Spotify API.'}, status=500)
+        if top_artists_response.status_code != 200:
+            return JsonResponse({'error': 'Error fetching top artists from Spotify API.'}, status=500)
+
+        # Step 4: Process the data
+        top_tracks_data = top_tracks_response.json()  # Parse the JSON response for top tracks
+        top_artists_data = top_artists_response.json()  # Parse the JSON response for top artists
+
+        if not top_tracks_data.get('items') or not top_artists_data.get('items'):
+            return JsonResponse({'error': 'No top tracks or artists found.'}, status=404)
+
+        top_tracks = process_top_tracks(top_tracks_data)
+        top_artists = process_top_artists(top_artists_data)
+
+        # Collect all the genres (pass the term for time-range)
+        top_genres = get_user_top_genres(access_token, term)
+
+        # Step 5: Save the wrap data to the database
+        try:
+            wrap_name = f"{term.replace('_', ' ').title()} Wrap {UserSpotifyData.objects.filter(user=request.user, term=term).count() + 1}"
+            wrap = UserSpotifyData.objects.create(
+                user=request.user,
+                wrap_name=wrap_name,
+                top_tracks=top_tracks,
+                top_artists=top_artists,
+                term=term,
+                top_genres=top_genres
+            )
+            return JsonResponse({'success': f'{wrap_name} created successfully.'})
+
+        except Exception as e:
+            return JsonResponse({'error': f'Error saving wrap: {str(e)}'}, status=500)
+
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+
+def refresh_spotify_token(refresh_token):
+    url = 'https://accounts.spotify.com/api/token'
+    
+    # Formulate the Authorization header
+    auth_str = f"{settings.SPOTIFY_CLIENT_ID}:{settings.SPOTIFY_CLIENT_SECRET}"
+    base64_auth = base64.b64encode(auth_str.encode('utf-8')).decode('utf-8')
+
+    headers = {
+        'Authorization': f'Basic {base64_auth}',
+        'Content-Type': 'application/x-www-form-urlencoded',
+    }
+
+    data = {
+        'grant_type': 'refresh_token',
+        'refresh_token': refresh_token,
+    }
+
+    response = requests.post(url, headers=headers, data=data)
+    if response.status_code == 200:
+        return response.json().get('access_token')
+    return None
+
+def process_top_tracks(data):
+    return [track['name'] for track in data.get('items', [])]
+
+def process_top_artists(data):
+    return [artist['name'] for artist in data.get('items', [])]
+
+def get_user_top_genres(access_token, term):
+    url = f'https://api.spotify.com/v1/me/top/artists?limit=50&time_range={term}'
+    headers = {'Authorization': f'Bearer {access_token}'}
+    response = requests.get(url, headers=headers)
+
+    if response.status_code != 200:
+        return []
+
+    genres = set()
+    for artist in response.json()['items']:
+        genres.update(artist.get('genres', []))
+
+    # Return only top 5 genres
+    return list(genres)[:5]  # Limit to top 5 genres
+
+
+@login_required
+def wrap_detail(request, wrap_id):
+    """Display the details of a specific wrap."""
+    try:
+        wrap = UserSpotifyData.objects.get(id=wrap_id, user=request.user)
+    except UserSpotifyData.DoesNotExist:
+        messages.error(request, 'Wrap not found or you do not have access to it.')
+        return redirect('dashboard')  # Redirect to the dashboard if the wrap doesn't exist or isn't owned by the user
+
+    # Data for the wrap
+    top_tracks = wrap.top_tracks
+    top_artists = wrap.top_artists
+    top_genres = wrap.top_genres
+    term = wrap.term  # short_term, medium_term, or long_term
+
+    return render(request, 'spotify_wrapped/wrap_detail.html', {
+        'wrap': wrap,
+        'top_tracks': top_tracks,
+        'top_artists': top_artists,
+        'top_genres': top_genres,
+        'term': term,
+    })
+    
 
 def contact_page(request):
     if request.method == "POST":
@@ -283,3 +409,4 @@ def contact_page(request):
         return render(request, 'accounts/contact.html', {'success_message': success_message})
 
     return render(request, 'accounts/contact.html')
+

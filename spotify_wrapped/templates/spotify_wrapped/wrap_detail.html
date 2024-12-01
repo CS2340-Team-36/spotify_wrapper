@@ -24,24 +24,26 @@
                 <h2 class="section-title">Top Tracks</h2>
                 <ul class="track-list">
                     {% for track in top_tracks %}
-                        <li class="track-item">
-                            <div class="track-name">{{ track.track_name }}</div>
-                            <div class="track-artists">by {{ track.artists }}</div>
-                        </li>
-                    {% endfor %}
+                    <li>{{ track }}</li>
+                {% empty %}
+                    <li>No top tracks found.</li>
+                {% endfor %}
+            
                 </ul>
             </div>
-
+        
             <!-- Slide 2: Top Artists -->
             <div class="slide">
                 <h2 class="section-title">Top Artists</h2>
                 <ul class="artist-list">
                     {% for artist in top_artists %}
-                        <li class="artist-item">{{ artist.name }}</li>
-                    {% endfor %}
+                    <li>{{ artist }}</li>
+                {% empty %}
+                    <li>No top artists found.</li>
+                {% endfor %}
                 </ul>
             </div>
-
+        
             <!-- Slide 3: Top Genres -->
             <div class="slide">
                 <h2 class="section-title">Top Genres</h2>
@@ -51,6 +53,8 @@
                     {% endfor %}
                 </ul>
             </div>
+        </div>
+        
 
             <!-- Add more slides here as needed -->
         </div>

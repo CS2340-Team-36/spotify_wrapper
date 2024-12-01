@@ -8,18 +8,25 @@
 
     <!-- Default theme is dark mode -->
     <link rel="stylesheet" href="{% static 'css/wrap_detail.css' %}" id="theme-stylesheet">  <!-- Dark theme uses wrap_detail.css -->
-    <link rel="stylesheet" href="{% static 'css/light-theme-slides.css' %}" id="light-theme-stylesheet" disabled> <!-- Light theme for slides -->
 
 </head>
 <body>
     <div class="wrap-container">
         <!-- Theme toggle button -->
-        <button id="toggle-theme" class="theme-toggle-btn">Toggle Light Mode</button>
+        <!-- <button id="toggle-theme" class="theme-toggle-btn">Toggle Light Mode</button> -->
 
         <h1 class="wrap-title">{{ wrap_name }}</h1>
 
         <div id="slides" class="slides-container">
-            <!-- Slide 1: Top Tracks -->
+            <!-- Slide 1: Intro -->
+            <div class="slide active">
+                <h2 class="section-title">Hey {{user.username}}</h2>
+                <ul class="track-list">
+                    <h2>Its Wrapped Time</h2>
+                    <h2>Ready? Lets do this!</h2>
+                </ul>
+            </div>
+            <!-- Slide 2: Top Tracks -->
             <div class="slide active">
                 <h2 class="section-title">Top Tracks</h2>
                 <ul class="track-list">
@@ -32,7 +39,15 @@
                 </ul>
             </div>
 
-            <!-- Slide 2: Top Artists -->
+            <!-- Slide 3: Transition to Top Artists -->
+            <div class="slide active">
+                <h2 class="section-title">YOUR TOP ARTIST WAS {{top_artists.0.name}}</h2>
+                <ul class="track-list">
+                    <h3>BUT YOU HAD ROOM IN YOUR HEART FOR MORE THAN ONE...</h3>
+                </ul>
+            </div>
+
+            <!-- Slide 4: Top Artists -->
             <div class="slide">
                 <h2 class="section-title">Top Artists</h2>
                 <ul class="artist-list">
@@ -42,17 +57,25 @@
                 </ul>
             </div>
 
-            <!-- Slide 3: Top Genres -->
-            <div class="slide">
-                <h2 class="section-title">Top Genres</h2>
-                <ul class="genre-list">
-                    {% for genre in top_genres %}
-                        <li class="genre-item">{{ genre }}</li>
-                    {% endfor %}
+            <!-- Slide 5: Transition to Top Genres -->
+            <div class="slide active">
+                <h2 class="section-title">This year was a feast for your ears</h2>
+                <ul class="track-list">
+                    <h3>Your top genre was {{top_genres.0}}</h3>
                 </ul>
             </div>
 
-           <!-- Slide 4: Lyrics Guessing Game Slide -->
+            <!-- Slide 6: Top Genres -->
+            <div class="slide">
+                <h2 class="section-title">Top Genres</h2>
+                <div class="genre-list-container" id="genre-list">
+                    {% for genre in top_genres %}
+                        <div class="genre-item">{{ genre }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+           <!-- Slide 7: Lyrics Guessing Game Slide -->
             <div class="slide">
                 {% if game_over %}
                     <div id="game-over"></div>
@@ -83,13 +106,12 @@
                 {% endif %}
             </div>
 
-                            
-            <!-- Slide 5: LLM Description -->
+            <!-- Slide 8: llms -->
             <div class="slide">
                 <h2 class="section-title">Your Personality Description</h2>
                 <p class="llm-description">
                 <p>{{ llm_description }}</p>
-
+                    
                     <!-- {% if wrap.llm_description %}
                         {{ llm_description }}
                     {% else %}
@@ -98,8 +120,7 @@
                 </p>
             </div>
 
-        </div>
-        
+                            
 
             <!-- Add more slides here as needed -->
         </div>
@@ -110,7 +131,7 @@
         </div>
     </div>
 
-    <script>
+    <!-- <script>
     document.addEventListener("DOMContentLoaded", function () {
         const themeToggleButton = document.getElementById('toggle-theme');
         const themeStylesheet = document.getElementById('theme-stylesheet');
@@ -133,7 +154,7 @@
             }
         });
     });
-    </script>
+    </script> -->
 
     <script src="{% static 'js/wrap_detail.js' %}"></script>
 </body>

@@ -528,7 +528,7 @@ def generate_personality_description(artists, genres, tracks):
             f"Imagine a person who listens to artists like {', '.join(artists[:3])}, "
             f"enjoys genres such as {', '.join(genres[:3])}, and their favorite tracks are "
             f"{', '.join(tracks[:3])}.\n"
-            "Describe their personality, hobbies, and interests in detail. Respond in second person and do not say the artist, genre, and tracks in your description. Focus more on adjectives and less preferences."
+            "Describe their personality, hobbies, and interests in detail. Respond in second person and do not say the artist, genre, and tracks in your description. Focus more on adjectives and less preferences. Answer consiely in ONLY 2-3 sentences and do not cut off in the middle."
         )
         # prompt = (
         #     "You are a music analyst. Describe the personality of a person who enjoys the following music:\n"

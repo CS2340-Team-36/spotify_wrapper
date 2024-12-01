@@ -190,4 +190,73 @@ body {
 
 .social-button:hover {
     opacity: 0.8;
+=======
+/* Style for the container */
+.genre-list-container {
+    display: flex;
+    flex-wrap: wrap;  /* Allow stacking of items */
+    gap: 15px;
+    justify-content: center;
+    padding-bottom: 10px;
+    position: relative;
+}
+
+/* Style for each genre item */
+.genre-item {
+    min-width: 150px;
+    text-align: center;
+    background-color: #282828;
+    color: #fff;
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 18px;
+    opacity: 0;  /* Initially hidden */
+    transform: translateY(50px); /* Start from below */
+    animation: slideIn 0.6s forwards; /* Trigger animation */
+}
+
+/* Delay each genre item's animation */
+.genre-item:nth-child(1) {
+    animation-delay: 0.1s;
+}
+.genre-item:nth-child(2) {
+    animation-delay: 0.2s;
+}
+.genre-item:nth-child(3) {
+    animation-delay: 0.3s;
+}
+.genre-item:nth-child(4) {
+    animation-delay: 0.4s;
+}
+.genre-item:nth-child(5) {
+    animation-delay: 0.5s;
+}
+/* Add more delays as needed for more items */
+
+/* Define the slide-in animation */
+@keyframes slideIn {
+    to {
+        opacity: 1;
+        transform: translateY(0); /* Move to original position */
+    }
+}
+
+/* For the sliding effect */
+#top-artists-list {
+    display: flex;
+    overflow: hidden;
+    width: 100%;
+}
+
+.artist-item {
+    margin-right: 10px; /* Adjust spacing between items */
+    opacity: 0; /* Initially hidden */
+    transform: translateX(100%); /* Initially offscreen */
+    transition: opacity 0.5s ease, transform 0.5s ease; /* Smooth transition */
+}
+
+.artist-item.active {
+    opacity: 1; /* Fade-in */
+    transform: translateX(0); /* Slide-in */
+
 }

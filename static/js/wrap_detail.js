@@ -6,25 +6,64 @@ document.addEventListener("DOMContentLoaded", function () {
     const form = document.getElementById('game-form');
     let timer;
 
+    // Genre slide scroll elements
+    const genreList = document.getElementById('genre-list');
+    const genreItems = document.querySelectorAll('.genre-item');
+    const genreItemWidth = genreItems[0].offsetWidth;
+
+    // Top Artists scroll elements
+    const topArtistsList = document.getElementById('top-artists-list');
+    const topArtistItems = document.querySelectorAll('.artist-item');
+    const topArtistItemWidth = topArtistItems[0]?.offsetWidth || 0;
+
+    // Function to reset and animate top artists
+    function animateTopArtists() {
+        // Remove the 'active' class from all artist items
+        topArtistItems.forEach(item => item.classList.remove('active'));
+
+        // Add 'active' class back to artist items with a delay for animation
+        topArtistItems.forEach((item, index) => {
+            setTimeout(() => {
+                item.classList.add('active');
+            }, index * 200); // Staggered effect (200ms delay between each item)
+        });
+    }
+
+    // Auto-scroll genres every 3 seconds
+    setInterval(() => {
+        genreList.scrollBy({
+            left: genreItemWidth,
+            behavior: 'smooth',
+        });
+    }, 3000); // Change time as needed
+
+    // Auto-scroll Top Artists every 3 seconds (optional)
+    setInterval(() => {
+        topArtistsList.scrollBy({
+            left: topArtistItemWidth,
+            behavior: 'smooth',
+        });
+    }, 3000); // Change time as needed
+
     function showSlide(index) {
         slides.forEach((slide, i) => {
             if (i === index) {
-                // Activate the current slide
                 slide.classList.add('active');
                 slide.style.opacity = "1"; // Fade-in effect
                 slide.style.transform = "translateX(0)"; // Ensure the slide is fully visible
     
-                // If the slide contains a game, start the timer
                 if (slide.querySelector('.game-info')) {
                     resetTimer();
                 }
+
+                // If it's the Top Artists slide, trigger the animation
+                if (i === 3) { // Slide 4 is at index 3
+                    animateTopArtists();
+                }
             } else {
-                // Deactivate other slides
                 slide.style.opacity = "0"; // Fade-out effect
                 slide.style.transform = "translateX(100%)"; // Move slide out of view
                 setTimeout(() => slide.classList.remove('active'), 500); // Match transition duration
-    
-                // Clear timer for non-active slides
                 if (slide.querySelector('.game-info')) {
                     clearInterval(timer);
                     resetTimerBar();
@@ -32,7 +71,6 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     
-        // Update session storage
         sessionStorage.setItem('currentSlide', index);
     }
 
@@ -40,8 +78,6 @@ document.addEventListener("DOMContentLoaded", function () {
     function startTimer(duration) {
         let timeLeft = duration;
         timerElement.textContent = timeLeft;
-
-        // Initialize the timer bar
         timerBar.style.width = "100%";
         timerBar.style.backgroundColor = "green";
 
@@ -49,7 +85,6 @@ document.addEventListener("DOMContentLoaded", function () {
             timeLeft--;
             timerElement.textContent = timeLeft;
 
-            // Update the timer bar width and color
             const widthPercentage = (timeLeft / duration) * 100;
             timerBar.style.width = `${widthPercentage}%`;
             if (timeLeft <= 10) {
@@ -83,10 +118,8 @@ document.addEventListener("DOMContentLoaded", function () {
         form.submit();
     }
 
-    // Initialize the correct slide and timer
     showSlide(currentSlide);
 
-    // Navigation Buttons
     document.getElementById('next').addEventListener('click', () => {
         currentSlide = (currentSlide + 1) % slides.length;
         showSlide(currentSlide);

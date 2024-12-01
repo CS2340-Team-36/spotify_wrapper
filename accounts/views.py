@@ -234,8 +234,9 @@ def create_wrapped(request):
                 top_artists=top_artists_data,
                 term=term,
                 top_genres=top_genres,
-                llm_description=llm_description
+                llm_description=llm_description,
             )
+            #print(wrap.llm_description)
             return JsonResponse({'success': f'{wrap_name} created successfully.'})
 
         except Exception as e:
@@ -306,6 +307,9 @@ def wrap_detail(request, wrap_id):
         # Get user top artists and genres
         top_artists = wrap.top_artists
         top_genres = wrap.top_genres
+        llm_description = wrap.llm_description
+        # print(f"LLM Description: {llm_description}")
+        term = wrap.term
 
         # Format the top tracks
         formatted_tracks = []
@@ -320,6 +324,8 @@ def wrap_detail(request, wrap_id):
             'top_tracks': formatted_tracks,
             'top_artists': top_artists.get('items', []),
             'top_genres': top_genres,
+            'term': term,
+            'llm_description': llm_description,
         }
 
         # Initialize 'scores' and 'correct_songs' in session if not already set
@@ -405,21 +411,21 @@ def wrap_detail(request, wrap_id):
         messages.error(request, 'Wrap not found or you do not have access to it.')
         return redirect('dashboard')  # Redirect to the dashboard if the wrap doesn't exist or isn't owned by the user
 
-    # Data for the wrap
-    top_tracks = wrap.top_tracks
-    top_artists = wrap.top_artists
-    top_genres = wrap.top_genres
-    term = wrap.term  # short_term, medium_term, or long_term
-    llm_description = wrap.llm_description
+    # # Data for the wrap
+    # top_tracks = wrap.top_tracks
+    # top_artists = wrap.top_artists
+    # top_genres = wrap.top_genres
+    # term = wrap.term  # short_term, medium_term, or long_term
+    # llm_description = wrap.llm_description
 
-    return render(request, 'spotify_wrapped/wrap_detail.html', {
-        'wrap': wrap,
-        'top_tracks': top_tracks,
-        'top_artists': top_artists,
-        'top_genres': top_genres,
-        'term': term,
-        'llm_description': llm_description,
-    })
+    # return render(request, 'spotify_wrapped/wrap_detail.html', {
+    #     'wrap': wrap,
+    #     'top_tracks': top_tracks,
+    #     'top_artists': top_artists,
+    #     'top_genres': top_genres,
+    #     'term': term,
+    #     'llm_description': llm_description,
+    # })
     
 
 def contact_page(request):
@@ -522,7 +528,7 @@ def generate_personality_description(artists, genres, tracks):
             f"Imagine a person who listens to artists like {', '.join(artists[:3])}, "
             f"enjoys genres such as {', '.join(genres[:3])}, and their favorite tracks are "
             f"{', '.join(tracks[:3])}.\n"
-            "Describe their personality, hobbies, and interests in detail. Respond in second person and do not say the artist, genre, and tracks in your description. Focus more on adjectives and less preferences."
+            "Describe their personality, hobbies, and interests in detail. Respond in second person and do not say the artist, genre, and tracks in your description. Focus more on adjectives and less preferences. Answer consiely in ONLY 2-3 sentences and do not cut off in the middle."
         )
         # prompt = (
         #     "You are a music analyst. Describe the personality of a person who enjoys the following music:\n"
@@ -543,7 +549,7 @@ def generate_personality_description(artists, genres, tracks):
             max_tokens=100,
             temperature=0.7,
         )
-        print("raw_response", response, type(response))
+        #print("raw_response", response['choices'][0]['message']['content'].strip(), type(response))
         # Extract the generated text
         return response['choices'][0]['message']['content'].strip()
     except Exception as e:

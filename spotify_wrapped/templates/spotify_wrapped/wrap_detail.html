@@ -7,6 +7,7 @@
     <title>{{ wrap_name }}</title>
 
     <!-- Default theme is dark mode -->
+
     <link
       rel="stylesheet"
       href="{% static 'css/wrap_detail.css' %}"
@@ -99,17 +100,70 @@
           <p id="result">{{ game_result }}</p>
           {% endif %} {% endif %}
         </div>
+            <!-- Slide 5: Transition to Top Genres -->
+            <div class="slide active">
+                <h2 class="section-title">This year was a feast for your ears</h2>
+                <ul class="track-list">
+                    <h3>Your top genre was {{top_genres.0}}</h3>
+                </ul>
+            </div>
 
-        <!-- Slide 5: LLM Description -->
-        <div class="slide">
-          <h2 class="section-title">Your Personality Description</h2>
-          <p class="llm-description">
-            {% if wrap.llm_description %} {{ wrap.llm_description }} {% else %}
-            No description available. Try generating a new wrap. {% endif %}
-          </p>
-        </div>
+            <!-- Slide 6: Top Genres -->
+            <div class="slide">
+                <h2 class="section-title">Top Genres</h2>
+                <div class="genre-list-container" id="genre-list">
+                    {% for genre in top_genres %}
+                        <div class="genre-item">{{ genre }}</div>
+                    {% endfor %}
+                </div>
+            </div>
 
-        <!-- Slide 6: Share Your Wrapped -->
+           <!-- Slide 7: Lyrics Guessing Game Slide -->
+            <div class="slide">
+                {% if game_over %}
+                    <div id="game-over"></div>
+                    <h2>Game Over!</h2>
+                    <p>Your final score is: {{ final_score }}</p>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <button type="submit" name="play_again" value="true">Play Again</button>
+                    </form>
+                {% else %}
+                    <h2>Guess the Song!</h2>
+                    <!-- Timer and Score Section -->
+                    <div class="game-info">
+                        <p>Time Left: <span id="timer">30</span> seconds</p>
+                        <div id="timer-bar"></div>
+                        <p>Score: <span id="score">{{ score }}</span></p>
+                    </div>
+                    <p><strong>Lyric Snippet:</strong> "{{ snippet }}"</p>
+                    <p><em>Artist:</em> {{ artist_name }}</p>
+                    <form method="POST" id="game-form">
+                        {% csrf_token %}
+                        <input type="text" name="guess" id="guess-input" placeholder="Enter song name" required>
+                        <button type="submit">Submit</button>
+                    </form>
+                    {% if game_result %}
+                        <p id="result">{{ game_result }}</p>
+                    {% endif %}
+                {% endif %}
+            </div>
+
+            <!-- Slide 8: llms -->
+            <div class="slide">
+                <h2 class="section-title">Your Personality Description</h2>
+                <p class="llm-description">
+                <p>{{ llm_description }}</p>
+                    
+                    <!-- {% if wrap.llm_description %}
+                        {{ llm_description }}
+                    {% else %}
+                        No description available. Try generating a new wrap.
+                    {% endif %} -->
+                </p>
+            </div>
+
+        <!-- Slide 9: Share Your Wrapped -->
         <div class="slide">
           <h2 class="section-title">Share Your Wrapped</h2>
           <p>Share your music wrapped with your friends!</p>
@@ -181,6 +235,7 @@
         });
       });
     </script>
+
 
     <script src="{% static 'js/wrap_detail.js' %}"></script>
   </body>

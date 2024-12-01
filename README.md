@@ -1,7 +1,7 @@
 # Spotify Wrapped
 
 > ### Disclaimer:
-> This project was developed as part of a personal project for **November 2024**. It is intended to showcase software development skills and explore new ways to visualize Spotify music listening data. The application provides a fun and interactive way for users to view their music habits and share them with friends.
+> This project was developed as part of Team 36's project for 2340-B project for **November 2024**. It is intended to showcase software development skills and explore new ways to visualize Spotify music listening data. The application provides a fun and interactive way for users to view their music habits and share them with friends.
 
 ## Overview:
 Spotify Wrapped is a web application that allows users to explore and interact with detailed insights about their Spotify music listening habits. Users can generate fun, colorful summaries of their musical tastes over short, medium, and long timeframes. They can save their Spotify wraps, play creative games, and share their wraps on their socials.

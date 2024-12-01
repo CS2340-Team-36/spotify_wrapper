@@ -10,7 +10,7 @@ Spotify Wrapped is a web application that allows users to explore and interact w
 ### A. User Authentication
 - Users can create an account and log in to access personalized features such as saving and viewing past Spotify wraps.
 - Users can log out, and their account information is persisted after exiting the website.
-- Users can creatr wraps from different spotify accounts withint he same local account
+- Users can create wraps from different spotify accounts withint he same local account
 - Users can delete their account and their wraps.
 
 ### B. Spotify Wrap Generation
@@ -84,8 +84,8 @@ python manage.py runserver
 
 ## Links:
 1. Team Website: 
-2. GitHub Repository: 
-3. Kanban Board:
+2. GitHub Repository: https://github.com/CS2340-Team-36/spotify_wrapper
+3. Kanban Board: https://trello.com/b/PjyDzB6w/2340-project-2-team-36
 
 
 ## Contributors:

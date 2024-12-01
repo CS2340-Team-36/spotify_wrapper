@@ -170,10 +170,20 @@ body {
     display: inline-block;
     margin: 10px;
     padding: 10px 20px;
-    color: #fff;
+    color: #fff; /* Default text color */
     text-decoration: none;
     border-radius: 5px;
     font-size: 16px;
+    text-align: center;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.twitter-button {
+    background-color: black; /* Black background for Twitter */
+    border: 2px solid white; /* White border */
+    color: white; /* White text color */
+    transition: background-color 0.3s, color 0.3s; /* Smooth hover transition */
 }
 
 .facebook-button {
@@ -184,13 +194,10 @@ body {
     background-color: #25D366;
 }
 
-.linkedin-button {
-    background-color: #0077b5;
-}
-
 .social-button:hover {
     opacity: 0.8;
-=======
+}
+
 /* Style for the container */
 .genre-list-container {
     display: flex;

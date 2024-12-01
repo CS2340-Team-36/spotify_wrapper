@@ -184,13 +184,12 @@
               >Share on WhatsApp</a
             >
 
-            <!-- LinkedIn Share Button -->
+            <!-- Twitter Share Button -->
             <a
-              href="https://www.linkedin.com/shareArticle?mini=true&url={{ request.build_absolute_uri|urlencode }}&title={{ wrap_name|urlencode }}&summary=Check out my music wrapped!&source={{ request.get_host|urlencode }}"
+              href="https://twitter.com/intent/tweet?text={{ wrap_name|urlencode }}%20-%20Check%20out%20my%20music%20Wrapped!%20%23MyMusicWrapped&url={{ request.build_absolute_uri|urlencode }}"
               target="_blank"
-              class="social-button linkedin-button"
-              >Share on LinkedIn</a
-            >
+              class="social-button twitter-button"
+            >Share on X</a>
           </div>
         </div>
 

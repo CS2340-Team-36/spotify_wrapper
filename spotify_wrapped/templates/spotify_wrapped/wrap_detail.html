@@ -53,6 +53,19 @@
                     {% endfor %}
                 </ul>
             </div>
+
+            <!-- Slide 4: LLM Description -->
+            <div class="slide">
+                <h2 class="section-title">Your Personality Description</h2>
+                <p class="llm-description">
+                    {% if wrap.llm_description %}
+                        {{ wrap.llm_description }}
+                    {% else %}
+                        No description available. Try generating a new wrap.
+                    {% endif %}
+                </p>
+            </div>
+
         </div>
         
 

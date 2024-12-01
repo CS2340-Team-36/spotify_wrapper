@@ -12,6 +12,9 @@ from .models import UserSpotifyData
 from django.views.decorators.cache import never_cache
 import base64
 from django.core.mail import send_mail
+import openai
+# from transformers import pipeline
+# from huggingface_hub import InferenceClient
 
 
 def register(request):
@@ -151,86 +154,6 @@ def refresh_access_token(refresh_token):
         return response.json().get('access_token')
     return None
 
-# @login_required
-# def create_wrapped(request):
-#     if not request.user.is_authenticated:
-#         return JsonResponse({'error': 'User not authenticated'}, status=401)
-    
-#     if request.method == 'POST':
-#         # Step 1: Fetch Spotify data (replace with actual access token for authenticated user)
-#         access_token = request.session.get('spotify_access_token')
-#         refresh_token = request.session.get('spotify_refresh_token')  # Get the refresh token if available
-#         if not access_token:
-#             return JsonResponse({'error': 'No Spotify token found for the user. Please authenticate with Spotify.'}, status=401)
-
-#         headers = {
-#             'Authorization': f'Bearer {access_token}',
-#         }
-
-#         # Fetch top tracks and top artists (limit 10)
-#         top_tracks_url = 'https://api.spotify.com/v1/me/top/tracks?limit=10'
-#         top_artists_url = 'https://api.spotify.com/v1/me/top/artists?limit=10'
-
-#         # Step 2: Try fetching top tracks and top artists
-#         top_tracks_response = requests.get(top_tracks_url, headers=headers)
-#         top_artists_response = requests.get(top_artists_url, headers=headers)
-
-#         # Check for token expiration
-#         if top_tracks_response.status_code == 401 and 'expired' in top_tracks_response.text:
-#             # Token expired, try refreshing it
-#             new_access_token = refresh_spotify_token(refresh_token)
-#             if not new_access_token:
-#                 return JsonResponse({'error': 'Error refreshing Spotify token.'}, status=500)
-            
-#             # Save the new access token in the session
-#             request.session['spotify_access_token'] = new_access_token
-#             headers['Authorization'] = f'Bearer {new_access_token}'  # Update the headers with the new access token
-
-#             # Retry the API requests with the new token
-#             top_tracks_response = requests.get(top_tracks_url, headers=headers)
-#             top_artists_response = requests.get(top_artists_url, headers=headers)
-
-#         if top_tracks_response.status_code != 200:
-#             return JsonResponse({'error': 'Error fetching top tracks from Spotify API.'}, status=500)
-#         if top_artists_response.status_code != 200:
-#             return JsonResponse({'error': 'Error fetching top artists from Spotify API.'}, status=500)
-
-#         # Step 3: Process the data
-#         top_tracks_data = top_tracks_response.json()  # Parse the JSON response for top tracks
-#         top_artists_data = top_artists_response.json()  # Parse the JSON response for top artists
-
-#         if not top_tracks_data.get('items') or not top_artists_data.get('items'):
-#             return JsonResponse({'error': 'No top tracks or artists found.'}, status=404)
-
-#         top_tracks = process_top_tracks(top_tracks_data)
-#         top_artists = process_top_artists(top_artists_data)
-
-#         # Collect all the genres
-#         top_genres = get_user_top_genres(access_token, 'short_term')
-
-#         # Determine the term (short, medium, or long)
-#         term = request.POST.get('term', 'short_term')
-#         if term not in ['short_term', 'medium_term', 'long_term']:
-#             return JsonResponse({'error': 'Invalid term specified. Must be one of: short_term, medium_term, long_term.'}, status=400)
-
-#         # Save the wrap data to the database
-#         try:
-#             wrap_name = f"{term.replace('_', ' ').title()} Wrap {UserSpotifyData.objects.filter(user=request.user, term=term).count() + 1}"
-#             wrap = UserSpotifyData.objects.create(
-#                 user=request.user,
-#                 wrap_name=wrap_name,
-#                 top_tracks=top_tracks,
-#                 top_artists=top_artists,
-#                 term=term,
-#                 top_genres=top_genres
-#             )
-#             return JsonResponse({'success': f'{wrap_name} created successfully.'})
-
-#         except Exception as e:
-#             return JsonResponse({'error': f'Error saving wrap: {str(e)}'}, status=500)
-
-#     else:
-#         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 @login_required
 def create_wrapped(request):
@@ -294,6 +217,11 @@ def create_wrapped(request):
         # Collect all the genres (pass the term for time-range)
         top_genres = process_top_genres(access_token, term)
 
+        try:
+            llm_description = generate_personality_description(top_artists, top_genres, top_tracks)
+        except Exception as e:
+            llm_description = "Could not generate description. Error occurred."
+
         # Step 5: Save the wrap data to the database
         try:
             wrap_name = f"{term.replace('_', ' ').title()} Wrap {UserSpotifyData.objects.filter(user=request.user, term=term).count() + 1}"
@@ -303,7 +231,8 @@ def create_wrapped(request):
                 top_tracks=top_tracks,
                 top_artists=top_artists,
                 term=term,
-                top_genres=top_genres
+                top_genres=top_genres,
+                llm_description=llm_description
             )
             return JsonResponse({'success': f'{wrap_name} created successfully.'})
 
@@ -372,6 +301,7 @@ def wrap_detail(request, wrap_id):
     top_artists = wrap.top_artists
     top_genres = wrap.top_genres
     term = wrap.term  # short_term, medium_term, or long_term
+    llm_description = wrap.llm_description
 
     return render(request, 'spotify_wrapped/wrap_detail.html', {
         'wrap': wrap,
@@ -379,6 +309,7 @@ def wrap_detail(request, wrap_id):
         'top_artists': top_artists,
         'top_genres': top_genres,
         'term': term,
+        'llm_description': llm_description,
     })
     
 
@@ -410,3 +341,102 @@ def contact_page(request):
 
     return render(request, 'accounts/contact.html')
 
+
+# def generate_llm_description(artists, genres, tracks):
+#     """
+#     Generate a description using a Hugging Face text-generation model.
+#     :param artists: List of top artists.
+#     :param genres: List of top genres.
+#     :param tracks: List of top tracks.
+#     :return: Generated description as a string.
+#     """
+#     # Load the text generation pipeline
+#     generator = pipeline("text-generation", model="gpt2")  # You can replace "gpt2" with a better model if needed.
+
+#     # Create the prompt for the model
+#     prompt = (
+#         f"Describe a person who listens to artists like {', '.join(artists[:3])}, "
+#         f"enjoys genres like {', '.join(genres[:3])}, and listens to tracks such as "
+#         f"{', '.join([track['name'] for track in tracks[:3]])}."
+#     )
+
+#     # Generate the description
+#     response = generator(prompt, max_length=100, num_return_sequences=1)
+
+#     # Return the generated text
+#     return response[0]['generated_text']
+
+# def generate_llm_description(artists, genres, tracks):
+#     try:
+#         # Initialize the Hugging Face Inference API
+#         client = InferenceClient(model="bigscience/bloomz-1b7", token=settings.LLM_API_KEY)
+
+#         # Construct the input prompt
+#         # prompt = (
+#         #     f"Describe a person who listens to artists like {', '.join(artists[:3])}, "
+#         #     f"enjoys genres like {', '.join(genres[:3])}, and listens to tracks such as "
+#         #     f"{', '.join([track['name'] for track in tracks[:3]])}."
+#         # )
+#         prompt = (
+#             "You are a music analyst. Describe the personality of a person who enjoys the following music:\n"
+#             "Top tracks: Love Story, Blank Space, Shake It Off.\n"
+#             "Top artists: Taylor Swift, Ed Sheeran, Dua Lipa.\n"
+#             "Top genres: Pop, Acoustic, Indie.\n"
+#             "Provide insights about their likely personality, hobbies, and lifestyle."
+#         )
+
+#         response = client.text_generation(prompt, max_new_tokens=50)
+#         print("Raw response:", response)  # Print the raw response
+#         print("Response type:", type(response))  # Check the type of the response
+
+#         # Ensure the response is a string or extract the text
+#         if isinstance(response, str):
+#             return response
+#         elif isinstance(response, dict):
+#             return response.get("generated_text", "Could not extract text from response.")
+#         else:
+#             return "Unexpected response format."
+#     except Exception as e:
+#         print(f"Error with Hugging Face Inference API: {e}")
+#         return "Could not generate description. Error occurred."
+
+
+def generate_personality_description(artists, genres, tracks):
+    try:
+        # Set up the OpenAI API key
+        openai.api_key = settings.LLM_API_KEY
+        print("artits", artists[:3])
+        print("Genres:", genres[:3])
+        print("Tracks:", tracks[:3])
+        # Construct the input prompt
+        prompt = (
+            f"Imagine a person who listens to artists like {', '.join(artists[:3])}, "
+            f"enjoys genres such as {', '.join(genres[:3])}, and their favorite tracks are "
+            f"{', '.join(tracks[:3])}.\n"
+            "Describe their personality, hobbies, and interests in detail. Respond in second person and do not say the artist, genre, and tracks in your description. Focus more on adjectives and less preferences."
+        )
+        # prompt = (
+        #     "You are a music analyst. Describe the personality of a person who enjoys the following music:\n"
+        #     "Top tracks: Love Story, Blank Space, Shake It Off.\n"
+        #     "Top artists: Taylor Swift, Ed Sheeran, Dua Lipa.\n"
+        #     "Top genres: Pop, Acoustic, Indie.\n"
+        #     "Provide insights about their likely personality, hobbies, and lifestyle."
+        # )
+
+        # Send the prompt to OpenAI API
+
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",  # Use "gpt-4" for better results if available
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant and music analyst."},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=100,
+            temperature=0.7,
+        )
+        print("raw_response", response, type(response))
+        # Extract the generated text
+        return response['choices'][0]['message']['content'].strip()
+    except Exception as e:
+        print(f"Error with OpenAI API: {e}")
+        return "Error occurred while generating description."

@@ -15,4 +15,6 @@ class UserSpotifyData(models.Model):
         ]
     )
     top_genres = models.JSONField(null=True, blank=True)  # Ensure this can store a list of genres
+    llm_description = models.TextField(null=True, blank=True)  # New field for LLM description
+
 

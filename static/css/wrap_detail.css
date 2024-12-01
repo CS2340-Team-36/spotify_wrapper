@@ -7,7 +7,7 @@ body {
     padding: 0;
     display: flex;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
     height: 100vh;
 }
 
@@ -18,11 +18,10 @@ body {
     padding: 20px;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
+    justify-content: center;
     align-items: center;
 }
 
-/* Title of the wrap */
 .wrap-title {
     font-size: 36px;
     font-weight: 700;
@@ -32,11 +31,9 @@ body {
 }
 
 #slides {
-    width: 100%;
     margin-top: 30px;
 }
 
-/* Section titles (Top Tracks, Top Artists, etc.) */
 .section-title {
     font-size: 24px;
     font-weight: 600;
@@ -44,44 +41,34 @@ body {
     margin-bottom: 10px;
 }
 
-/* List styles */
 .track-list,
 .artist-list,
-.genre-list {
+.genre-list { /* Added genre list styling */
     list-style: none;
     padding: 0;
-    margin: 0;
 }
 
-/* General item styling */
 .track-item,
 .artist-item,
-.genre-item {
+.genre-item { /* Added genre item styling */
     font-size: 18px;
     margin-bottom: 15px;
 }
 
-/* Track name styling */
 .track-name {
     font-weight: 600;
-    font-size: 20px;
-    margin-bottom: 5px;
 }
 
-/* Artist name styling */
 .track-artists {
     font-weight: 300;
     color: #b3b3b3;
-    font-size: 16px;
 }
 
-/* Navigation buttons */
 .nav-buttons {
     display: flex;
     justify-content: space-between;
     margin-top: 30px;
-    width: 100%;
-    max-width: 400px; /* Adjusts button size */
+    width: 100%; /* Ensures the buttons stretch across the container */
 }
 
 .nav-btn {
@@ -107,10 +94,25 @@ body {
 .slide {
     display: none;
     text-align: center;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: opacity 0.5s ease, transform 0.5s ease;
 }
 
 .slide.active {
     display: block;
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.track-item:hover,
+.artist-item:hover,
+.genre-item:hover {
+    background-color: #282828;
+    color: #1db954;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    cursor: pointer;
 }
 
 /* Responsive design */
@@ -132,4 +134,27 @@ body {
     .genre-item {
         font-size: 16px;
     }
+}
+
+
+.game-info {
+    position: relative;
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+#timer-bar {
+    height: 10px;
+    width: 100%;
+    background-color: green;
+    transition: width 1s linear; /* Smooth width transition */
+    margin-top: 5px;
+}
+
+#timer {
+    font-weight: bold;
+}
+
+#score {
+    font-weight: bold;
 }

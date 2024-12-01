@@ -141,6 +141,7 @@ load_dotenv()
 SPOTIFY_CLIENT_ID = os.getenv('SPOTIFY_CLIENT_ID')
 SPOTIFY_CLIENT_SECRET = os.getenv('SPOTIFY_CLIENT_SECRET')
 SPOTIFY_REDIRECT_URI = os.getenv('SPOTIFY_REDIRECT_URI')
+GENIUS_API_KEY = os.getenv('GENIUS_API_KEY')
 
 CSRF_TRUSTED_ORIGINS = [
     'https://accounts.spotify.com',

@@ -12,7 +12,8 @@ from .models import UserSpotifyData
 from django.views.decorators.cache import never_cache
 import base64
 from django.core.mail import send_mail
-
+from accounts.utils import get_lyric_snippet
+import random
 
 def register(request):
     if request.method == 'POST':
@@ -300,8 +301,8 @@ def create_wrapped(request):
             wrap = UserSpotifyData.objects.create(
                 user=request.user,
                 wrap_name=wrap_name,
-                top_tracks=top_tracks,
-                top_artists=top_artists,
+                top_tracks=top_tracks_data,
+                top_artists=top_artists_data,
                 term=term,
                 top_genres=top_genres
             )
@@ -358,28 +359,121 @@ def process_top_genres(access_token, term):
     return list(genres)[:5]  # Limit to top 5 genres
 
 
-@login_required
+@never_cache
+@login_required(login_url='login')
 def wrap_detail(request, wrap_id):
-    """Display the details of a specific wrap."""
     try:
-        wrap = UserSpotifyData.objects.get(id=wrap_id, user=request.user)
+        # Fetch wrap data for the given wrap_id
+        wrap = UserSpotifyData.objects.get(user=request.user, id=wrap_id)
+        top_tracks = wrap.top_tracks
+
+        # Ensure we have the correct access_token for the logged-in user
+        access_token = request.session.get('spotify_access_token')
+
+        if not access_token:
+            return redirect('spotify_login')
+
+        # Get user top artists and genres
+        top_artists = wrap.top_artists
+        top_genres = wrap.top_genres
+
+        # Format the top tracks
+        formatted_tracks = []
+        for track in top_tracks.get('items', [])[:5]:
+            track_name = track['name']
+            artists = ', '.join(artist['name'] for artist in track['artists'])
+            formatted_tracks.append({'track_name': track_name, 'artists': artists})
+
+        # Initialize context with Wrapped data
+        context = {
+            'wrap_name': wrap.wrap_name,
+            'top_tracks': formatted_tracks,
+            'top_artists': top_artists.get('items', []),
+            'top_genres': top_genres,
+        }
+
+        # Initialize 'scores' and 'correct_songs' in session if not already set
+        if 'scores' not in request.session:
+            request.session['scores'] = {}
+        if 'correct_songs' not in request.session:
+            request.session['correct_songs'] = {}
+
+        # Convert wrap_id to string because session keys must be strings
+        wrap_id_str = str(wrap_id)
+
+        # Initialize score and correct_song for this wrap if not present
+        if wrap_id_str not in request.session['scores']:
+            request.session['scores'][wrap_id_str] = 0
+
+        if request.method == 'POST':
+            if 'timeout' in request.POST:
+                # User ran out of time
+                correct_song = request.session['correct_songs'].get(wrap_id_str, '')
+                context['game_result'] = f"Time's up! The correct answer was {correct_song}."
+                request.session['scores'][wrap_id_str] -= 5  # Deduct points for timeout
+            else:
+                # Handle the user's guess
+                user_guess = request.POST.get('guess')
+                correct_song = request.session['correct_songs'].get(wrap_id_str, '').lower()
+
+                if user_guess.lower() == correct_song.lower():
+                    context['game_result'] = 'Correct! 🎉'
+                    request.session['scores'][wrap_id_str] += 10  # Add 10 points
+                else:
+                    context['game_result'] = f'Wrong! The correct answer was {correct_song}.'
+                    request.session['scores'][wrap_id_str] -= 5  # Deduct 5 points
+
+            # Generate a new song for the next game
+            selected_track = random.choice(top_tracks.get('items', []))
+            song_name = selected_track['name']
+            artist_name = selected_track['artists'][0]['name']
+            snippet = get_lyric_snippet(song_name, artist_name)
+
+            # Handle case when no lyrics are found
+            if snippet is None:
+                snippet = "Sorry, no lyrics available for this song."
+
+            # Store the correct song name in the session for this wrap
+            request.session['correct_songs'][wrap_id_str] = song_name
+
+            # Add lyrics game data to context
+            context.update({
+                'snippet': snippet,
+                'artist_name': artist_name,
+            })
+
+        else:
+            # Reset the result on a new question
+            context['game_result'] = None
+            selected_track = random.choice(top_tracks.get('items', []))
+            song_name = selected_track['name']
+            artist_name = selected_track['artists'][0]['name']
+            snippet = get_lyric_snippet(song_name, artist_name)
+
+            # Handle case when no lyrics are found
+            if snippet is None:
+                snippet = "Sorry, no lyrics available for this song."
+
+            # Store the correct song name in the session for this wrap
+            request.session['correct_songs'][wrap_id_str] = song_name
+
+            # Add lyrics game data to context
+            context.update({
+                'snippet': snippet,
+                'artist_name': artist_name,
+            })
+
+        # Include the score for this wrap in the context
+        context['score'] = request.session['scores'][wrap_id_str]
+
+        # Mark the session as modified to ensure it gets saved
+        request.session.modified = True
+
+        return render(request, 'spotify_wrapped/wrap_detail.html', context)
+
     except UserSpotifyData.DoesNotExist:
-        messages.error(request, 'Wrap not found or you do not have access to it.')
-        return redirect('dashboard')  # Redirect to the dashboard if the wrap doesn't exist or isn't owned by the user
-
-    # Data for the wrap
-    top_tracks = wrap.top_tracks
-    top_artists = wrap.top_artists
-    top_genres = wrap.top_genres
-    term = wrap.term  # short_term, medium_term, or long_term
-
-    return render(request, 'spotify_wrapped/wrap_detail.html', {
-        'wrap': wrap,
-        'top_tracks': top_tracks,
-        'top_artists': top_artists,
-        'top_genres': top_genres,
-        'term': term,
-    })
+        messages.error(request, "Wrap not found.")
+        return redirect('dashboard')
     
 
 def contact_page(request):

@@ -5,6 +5,51 @@
 <head>
     <title>Dashboard</title>
     <link rel="stylesheet" href="{% static 'css/light-theme.css' %}" id="theme-stylesheet">
+    <style>
+        .wraps-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        .wrap-column {
+            flex: 1;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+        .wrap-column h3 {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .wrap-column ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .wrap-column li {
+            margin: 5px 0;
+        }
+        .wrap-column a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+        .wrap-column a:hover {
+            text-decoration: underline;
+        }
+        .create-wrap-btn {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .create-wrap-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
     <button id="toggle-theme">Toggle Dark Mode</button>
@@ -15,37 +60,86 @@
     <br>
     <a href="{% url 'spotify_login' %}">Login with Spotify</a>
     <br>
-    <button id="create-wrapped-btn">Create Wrapped</button>
-    <!-- <a href="{% url 'create_wrapped' %}" id="create-wrapped-link">Create Wrapped</button>  -->
 
-    <h2>Your Spotify Wraps</h2>
-    {% if user_data_list %}
-        <ul>
-            {% for data in user_data_list %}
-                <li>
-                    <h3>{{ data.wrap_name }}</h3>
-                    <ul>
-                        {% for track in data.top_tracks.items %}
-                            <li>{{ track.name }} by {{ track.artists.0.name }}</li>
-                        {% endfor %}
-                    </ul>
-                    <a href="{% url 'wrap_detail' data.id %}">View Wrap Details</a>
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No Spotify wraps saved yet.</p>
-    {% endif %}
+    <h3>Create Wrapped for Timeframe</h3>
+    <div class="wraps-container">
+        <!-- Short Term Wrap -->
+        <div class="wrap-column">
+            <button class="create-wrap-btn" data-term="short_term">Create Short Term Wrap</button>
+            <h3>Short Term</h3>
+            {% if short_term_wraps %}
+                <ul>
+                    {% for data in short_term_wraps %}
+                        <li>
+                            <strong>{{ data.wrap_name }}</strong>
+                            <ul>
+                                {% for track in data.top_tracks.items %}
+                                    <li>{{ track.name }} by {{ track.artists.0.name }}</li>
+                                {% endfor %}
+                            </ul>
+                            <a href="{% url 'wrap_detail' data.id %}">View Wrap Details</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No short-term wraps available yet.</p>
+            {% endif %}
+        </div>
 
+        <!-- Medium Term Wrap -->
+        <div class="wrap-column">
+            <button class="create-wrap-btn" data-term="medium_term">Create Medium Term Wrap</button>
+            <h3>Medium Term</h3>
+            {% if medium_term_wraps %}
+                <ul>
+                    {% for data in medium_term_wraps %}
+                        <li>
+                            <strong>{{ data.wrap_name }}</strong>
+                            <ul>
+                                {% for track in data.top_tracks.items %}
+                                    <li>{{ track.name }} by {{ track.artists.0.name }}</li>
+                                {% endfor %}
+                            </ul>
+                            <a href="{% url 'wrap_detail' data.id %}">View Wrap Details</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No medium-term wraps available yet.</p>
+            {% endif %}
+        </div>
+
+        <!-- Long Term Wrap -->
+        <div class="wrap-column">
+            <button class="create-wrap-btn" data-term="long_term">Create Long Term Wrap</button>
+            <h3>Long Term</h3>
+            {% if long_term_wraps %}
+                <ul>
+                    {% for data in long_term_wraps %}
+                        <li>
+                            <strong>{{ data.wrap_name }}</strong>
+                            <ul>
+                                {% for track in data.top_tracks.items %}
+                                    <li>{{ track.name }} by {{ track.artists.0.name }}</li>
+                                {% endfor %}
+                            </ul>
+                            <a href="{% url 'wrap_detail' data.id %}">View Wrap Details</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No long-term wraps available yet.</p>
+            {% endif %}
+        </div>
+    </div>
 
     <script>
-    document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function () {
         const themeToggleButton = document.getElementById('toggle-theme');
         const themeStylesheet = document.getElementById('theme-stylesheet');
 
         themeToggleButton.addEventListener('click', () => {
             const currentTheme = themeStylesheet.getAttribute('href');
-
             if (currentTheme === '{% static "css/light-theme.css" %}') {
                 themeStylesheet.setAttribute('href', '{% static "css/dark-theme.css" %}');
             } else {
@@ -53,30 +147,39 @@
             }
         });
 
-        const createWrappedLink = document.getElementById('create-wrapped-btn');
+        const createWrapButtons = document.querySelectorAll('.create-wrap-btn');
 
-        createWrappedLink.addEventListener('click', async function (event) {
-            event.preventDefault();  // Prevent default anchor behavior
+        createWrapButtons.forEach((button) => {
+    button.addEventListener('click', async function () {
+        const term = button.getAttribute('data-term');
+        const formData = new FormData();
+        formData.append('term', term);
 
-            try {
-                const response = await fetch("{% url 'create_wrapped' %}", {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': '{{ csrf_token }}',
-                    },
-                });
+        try {
+            const response = await fetch("{% url 'create_wrapped' %}", {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}",
+                },
+                body: formData,  // Use FormData to send data as form-encoded
+            });
 
-                const data = await response.json();
-                if (response.ok) {
-                    alert(data.success);  // Success message
-                    location.reload();   // Reload the page to show the new wrap
-                } else {
-                    alert(data.error);   // Error message
-                }
-            } catch (err) {
-                alert('Something went wrong. Please try again.');
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error("Server Error:", errorText);
+                alert("Server error occurred. Check console for details.");
+                return;
             }
-        });
+
+            const data = await response.json();
+            alert(data.success || data.error || "Unknown response.");
+            location.reload();
+        } catch (err) {
+            console.error("Error:", err);
+            alert("Error: " + err.message);
+        }
+    });
+});
 
     });
     </script>

@@ -3,13 +3,14 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseRedirect
 import json
 from django.conf import settings
 import urllib.parse
 import requests
 from .models import UserSpotifyData
 from django.views.decorators.cache import never_cache
+from django.urls import reverse
 import base64
 from django.core.mail import send_mail
 from accounts.utils import get_lyric_snippet
@@ -226,7 +227,7 @@ def create_wrapped(request):
 
         # Step 5: Save the wrap data to the database
         try:
-            wrap_name = f"{term.replace('_', ' ').title()} Wrap {UserSpotifyData.objects.filter(user=request.user, term=term).count() + 1}"
+            wrap_name = f"{request.user.username}'s {term.replace('_', ' ').title()} Wrap"            
             wrap = UserSpotifyData.objects.create(
                 user=request.user,
                 wrap_name=wrap_name,
@@ -555,3 +556,16 @@ def generate_personality_description(artists, genres, tracks):
     except Exception as e:
         print(f"Error with OpenAI API: {e}")
         return "Error occurred while generating description."
+    
+@login_required
+def delete_wrap(request, wrap_id):
+    try:
+        # Fetch the wrap to delete
+        wrap = UserSpotifyData.objects.get(id=wrap_id, user=request.user)
+        wrap.delete()  # Delete the wrap
+        messages.success(request, 'Wrap deleted successfully.')
+    except UserSpotifyData.DoesNotExist:
+        messages.error(request, 'Wrap not found.')
+
+    # Redirect to the dashboard after deletion
+    return HttpResponseRedirect(reverse('dashboard'))

@@ -227,3 +227,30 @@ body {
     opacity: 1; /* Fade-in */
     transform: translateX(0); /* Slide-in */
 }
+
+/* Button to match Spotify theme */
+.back-btn {
+    text-decoration: none; /* Remove underline */
+}
+
+.back-btn button {
+    background-color: #1db954; /* Spotify Green */
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    margin-top: 20px;
+}
+
+.back-btn button:hover {
+    background-color: #1ed760; /* Lighter green on hover */
+    transform: scale(1.05); /* Slight scaling effect on hover */
+}
+
+.back-btn button:focus {
+    outline: none;
+}

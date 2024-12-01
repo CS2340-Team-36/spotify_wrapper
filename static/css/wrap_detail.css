@@ -159,46 +159,6 @@ body {
     font-weight: bold;
 }
 
-
-.social-share-buttons {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 20px;
-}
-
-.social-button {
-    display: inline-block;
-    margin: 10px;
-    padding: 10px 20px;
-    color: #fff; /* Default text color */
-    text-decoration: none;
-    border-radius: 5px;
-    font-size: 16px;
-    text-align: center;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-.twitter-button {
-    background-color: black; /* Black background for Twitter */
-    border: 2px solid white; /* White border */
-    color: white; /* White text color */
-    transition: background-color 0.3s, color 0.3s; /* Smooth hover transition */
-}
-
-.facebook-button {
-    background-color: #3b5998;
-}
-
-.whatsapp-button {
-    background-color: #25D366;
-}
-
-.social-button:hover {
-    opacity: 0.8;
-}
-
 /* Style for the container */
 .genre-list-container {
     display: flex;
@@ -268,6 +228,27 @@ body {
     transform: translateX(0); /* Slide-in */
 }
 
+/* Style for the container */
+#top-tracks-list {
+    display: flex;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    width: 100%;
+}
+
+/* Initial state for each track item */
+.track-item {
+    opacity: 0; /* Initially invisible */
+    transform: translateX(100%); /* Positioned offscreen to the right */
+    transition: opacity 0.5s ease, transform 0.5s ease; /* Smooth fade and slide transition */
+}
+
+/* Animated state */
+.track-item.active {
+    opacity: 1; /* Fully visible */
+    transform: translateX(0); /* Slide into view */
+}
+
 /* Button to match Spotify theme */
 .back-btn {
     text-decoration: none; /* Remove underline */
@@ -293,4 +274,198 @@ body {
 
 .back-btn button:focus {
     outline: none;
+}
+
+/* Slide 1 animations */
+.slide-intro .section-title {
+    animation: fadeIn 1.5s ease-in-out forwards; /* Fade-in for the section title */
+    opacity: 0;
+}
+
+.slide-intro .track-list h2:first-child {
+    animation: bounceIn 1s ease-out forwards; /* Bounce effect for "It's Wrapped Time" */
+    opacity: 1; /* Ensure it stays visible */
+    transform: translateY(0); /* No movement after animation */
+}
+
+.slide-intro .track-list h2:last-child {
+    animation: zoomIn 1s ease-out forwards 1.5s; /* Increased delay for "Ready? Let's do this!" */
+    opacity: 0;
+    transform: scale(0.5);
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+/* Bounce-in animation */
+@keyframes bounceIn {
+    0% {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    60% {
+        transform: translateY(-20px);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1; /* Keep it visible after animation */
+    }
+}
+
+/* Zoom-in animation */
+@keyframes zoomIn {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Slide 3 animations */
+.slide-transition .section-title {
+    animation: fadeIn 1.5s ease-in-out forwards; /* Fade-in for the section title */
+    opacity: 0;
+}
+
+.slide-transition .track-list h3:first-child {
+    animation: bounceIn 1s ease-out forwards; /* Bounce effect for "YOUR TOP ARTIST WAS ..." */
+    opacity: 1; /* Ensure it stays visible */
+    transform: translateY(0); /* No movement after animation */
+}
+
+.slide-transition .track-list h3:last-child {
+    animation: zoomIn 1s ease-out forwards 1.5s; /* Increased delay for "BUT YOU HAD ROOM IN YOUR HEART ..." */
+    opacity: 0;
+    transform: scale(0.5);
+}
+
+/* Reuse the existing animations */
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes bounceIn {
+    0% {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    60% {
+        transform: translateY(-20px);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1; /* Keep it visible after animation */
+    }
+}
+
+@keyframes zoomIn {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Slide 5 animations */
+.slide-transition-genres .section-title {
+    animation: fadeIn 1.5s ease-in-out forwards; /* Fade-in for the section title */
+    opacity: 0;
+}
+
+.slide-transition-genres .track-list h3:first-child {
+    animation: bounceIn 1s ease-out forwards; /* Bounce effect for "This year was a feast for your ears" */
+    opacity: 1; /* Ensure it stays visible */
+    transform: translateY(0); /* No movement after animation */
+}
+
+.slide-transition-genres .track-list h3:last-child {
+    animation: zoomIn 1s ease-out forwards 1.5s; /* Increased delay for "Your top genre was ..." */
+    opacity: 0;
+    transform: scale(0.5);
+}
+
+/* Reuse the existing animations */
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes bounceIn {
+    0% {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    60% {
+        transform: translateY(-20px);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1; /* Keep it visible after animation */
+    }
+}
+
+@keyframes zoomIn {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.social-share-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.social-button {
+    display: inline-block;
+    margin: 10px;
+    padding: 10px 20px;
+    color: #fff; /* Default text color */
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 16px;
+    text-align: center;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.twitter-button {
+    background-color: black; /* Black background for Twitter */
+    border: 2px solid white; /* White border */
+    color: white; /* White text color */
+    transition: background-color 0.3s, color 0.3s; /* Smooth hover transition */
+}
+
+.facebook-button {
+    background-color: #3b5998;
+}
+
+.whatsapp-button {
+    background-color: #25D366;
+}
+
+.social-button:hover {
+    opacity: 0.8;
 }

@@ -20,16 +20,16 @@
         <!-- <button id="toggle-theme" class="theme-toggle-btn">Toggle Light Mode</button> -->
 
         <h1 class="wrap-title">{{ wrap_name }}</h1>
-
         <div id="slides" class="slides-container">
             <!-- Slide 1: Intro -->
-            <div class="slide active">
-                <h2 class="section-title">Hey {{user.username}}</h2>
+            <div class="slide slide-intro active">
+                <h2 class="section-title">Hey {{ user.username }}</h2>
                 <ul class="track-list">
-                    <h2>Its Wrapped Time</h2>
-                    <h2>Ready? Lets do this!</h2>
+                    <h2>It's Wrapped Time</h2>
+                    <h2>Ready? Let's do this!</h2>
                 </ul>
             </div>
+            
             <!-- Slide 2: Top Tracks -->
             <div class="slide active">
                 <h2 class="section-title">Top Tracks</h2>
@@ -44,7 +44,7 @@
             </div>
 
             <!-- Slide 3: Transition to Top Artists -->
-            <div class="slide active">
+            <div class="slide slide-transition active">
                 <h2 class="section-title">YOUR TOP ARTIST WAS {{top_artists.0.name}}</h2>
                 <ul class="track-list">
                     <h3>BUT YOU HAD ROOM IN YOUR HEART FOR MORE THAN ONE...</h3>
@@ -62,7 +62,7 @@
             </div>
 
             <!-- Slide 5: Transition to Top Genres -->
-            <div class="slide active">
+            <div class="slide slide-transition-genres active">
                 <h2 class="section-title">This year was a feast for your ears</h2>
                 <ul class="track-list">
                     <h3>Your top genre was {{top_genres.0}}</h3>

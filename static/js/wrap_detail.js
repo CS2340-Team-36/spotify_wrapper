@@ -9,12 +9,17 @@ document.addEventListener("DOMContentLoaded", function () {
     // Genre slide scroll elements
     const genreList = document.getElementById('genre-list');
     const genreItems = document.querySelectorAll('.genre-item');
-    const genreItemWidth = genreItems[0].offsetWidth;
+    const genreItemWidth = genreItems[0]?.offsetWidth || 0;
 
     // Top Artists scroll elements
     const topArtistsList = document.getElementById('top-artists-list');
     const topArtistItems = document.querySelectorAll('.artist-item');
     const topArtistItemWidth = topArtistItems[0]?.offsetWidth || 0;
+
+    // Top Tracks scroll elements
+    const topTracksList = document.getElementById('top-tracks-list');
+    const topTrackItems = document.querySelectorAll('.track-item');
+    const topTrackItemWidth = topTrackItems[0]?.offsetWidth || 0;
 
     // Function to reset and animate top artists
     function animateTopArtists() {
@@ -29,6 +34,19 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    // Function to reset and animate top tracks
+    function animateTopTracks() {
+        // Remove the 'active' class from all track items
+        topTrackItems.forEach(item => item.classList.remove('active'));
+
+        // Add 'active' class back to track items with a delay for animation
+        topTrackItems.forEach((item, index) => {
+            setTimeout(() => {
+                item.classList.add('active');
+            }, index * 200); // Staggered effect (200ms delay between each item)
+        });
+    }
+
     // Auto-scroll genres every 3 seconds
     setInterval(() => {
         genreList.scrollBy({
@@ -37,10 +55,18 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }, 3000); // Change time as needed
 
-    // Auto-scroll Top Artists every 3 seconds (optional)
+    // Auto-scroll Top Artists every 3 seconds
     setInterval(() => {
         topArtistsList.scrollBy({
             left: topArtistItemWidth,
+            behavior: 'smooth',
+        });
+    }, 3000); // Change time as needed
+
+    // Auto-scroll Top Tracks every 3 seconds
+    setInterval(() => {
+        topTracksList.scrollBy({
+            left: topTrackItemWidth,
             behavior: 'smooth',
         });
     }, 3000); // Change time as needed
@@ -59,6 +85,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 // If it's the Top Artists slide, trigger the animation
                 if (i === 3) { // Slide 4 is at index 3
                     animateTopArtists();
+                }
+
+                // If it's the Top Tracks slide, trigger the animation
+                if (i === 1) { // Slide 2 is at index 1
+                    animateTopTracks();
                 }
             } else {
                 slide.style.opacity = "0"; // Fade-out effect

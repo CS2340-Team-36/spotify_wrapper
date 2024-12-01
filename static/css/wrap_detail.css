@@ -159,6 +159,46 @@ body {
     font-weight: bold;
 }
 
+
+.social-share-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.social-button {
+    display: inline-block;
+    margin: 10px;
+    padding: 10px 20px;
+    color: #fff; /* Default text color */
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 16px;
+    text-align: center;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.twitter-button {
+    background-color: black; /* Black background for Twitter */
+    border: 2px solid white; /* White border */
+    color: white; /* White text color */
+    transition: background-color 0.3s, color 0.3s; /* Smooth hover transition */
+}
+
+.facebook-button {
+    background-color: #3b5998;
+}
+
+.whatsapp-button {
+    background-color: #25D366;
+}
+
+.social-button:hover {
+    opacity: 0.8;
+}
+
 /* Style for the container */
 .genre-list-container {
     display: flex;

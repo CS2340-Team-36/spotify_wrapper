@@ -70,12 +70,14 @@ python manage.py runserver
 ```
 
 
-## Built with
+* [![Bootstrap][Bootstrap.com]][Bootstrap-url]
 * [![JavaScript][JavaScript.com]][JavaScript-url]
 * [![HTML][HTML.com]][HTML-url]
 * [![CSS][CSS.com]][CSS-url]
 * [![Python][Python.org]][Python-url]
 
+[Bootstrap.com]: https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white
+[Bootstrap-url]: https://getbootstrap.com/
 
 [JavaScript.com]: https://img.shields.io/badge/JavaScript-323330?style=for-the-badge&logo=javascript
 [JavaScript-url]: https://www.javascript.com/
@@ -88,6 +90,7 @@ python manage.py runserver
 
 [Python.org]: https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python
 [Python-url]: https://www.python.org/
+
 
 ## Links:
 1. Team Website: https://ananyapattamatta7.wixstudio.com/team36

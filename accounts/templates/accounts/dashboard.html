@@ -87,12 +87,17 @@
             border-radius: 8px;
             margin: 10px 0;
             padding: 10px;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s, color 0.3s;
         }
 
+        /* Change background and link color on hover */
         .wrap-column li:hover {
             background-color: #1db954;
             color: #121212;
+        }
+
+        .wrap-column li:hover a {
+            color: #fff; /* Turn the link white on hover */
         }
 
         .create-wrap-btn {

@@ -1,6 +1,6 @@
 /* Global styles to match Spotify's dark theme */
 body {
-    font-family: 'Inter', sans-serif; /* Better font for readability */
+    font-family: 'Helvetica Neue', sans-serif;
     background-color: #121212;
     color: white;
     margin: 0;
@@ -9,58 +9,50 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    overflow: hidden; /* Prevent scrolling on body */
 }
 
 /* Centering the wrap container */
 .wrap-container {
     width: 100%;
-    max-width: 900px;
-    padding: 2rem;
+    max-width: 800px;
+    padding: 20px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    box-sizing: border-box;
 }
 
-/* Title styling (Name should be the biggest) */
 .wrap-title {
-    font-size: 3rem; /* Make the name the largest */
-    font-weight: 900; /* Boldest weight for the name */
+    font-size: 36px;
+    font-weight: 700;
     text-align: center;
     color: #1db954;
-    margin-bottom: 1rem; /* Reduced space between title and slide content */
+    margin-bottom: 20px;
 }
 
-/* Slide container margin */
 #slides {
-    margin-top: 1.5rem; /* Reduced margin to decrease the space */
+    margin-top: 30px;
 }
 
-/* Section titles */
 .section-title {
-    font-size: 1.75rem;
+    font-size: 24px;
     font-weight: 600;
     color: #b3b3b3;
-    margin-bottom: 1.5rem;
+    margin-bottom: 10px;
 }
 
-/* Lists (Tracks, Artists, Genres) */
 .track-list,
 .artist-list,
-.genre-list {
+.genre-list { /* Added genre list styling */
     list-style: none;
     padding: 0;
-    margin: 0;
 }
 
 .track-item,
 .artist-item,
-.genre-item {
-    font-size: 1.25rem;
-    margin-bottom: 1rem;
-    word-wrap: break-word; /* Ensure text doesn't overflow */
+.genre-item { /* Added genre item styling */
+    font-size: 18px;
+    margin-bottom: 15px;
 }
 
 .track-name {
@@ -72,25 +64,22 @@ body {
     color: #b3b3b3;
 }
 
-/* Navigation buttons (Back to Dashboard, Previous, Next) */
 .nav-buttons {
     display: flex;
     justify-content: space-between;
-    margin-top: 3rem;
-    width: 100%;
-    gap: 1rem;
+    margin-top: 30px;
+    width: 100%; /* Ensures the buttons stretch across the container */
 }
 
 .nav-btn {
     background-color: #1db954;
     color: white;
     border: none;
-    padding: 1rem 2rem;
-    font-size: 1.25rem;
+    padding: 10px 20px;
+    font-size: 18px;
     cursor: pointer;
-    border-radius: 50px;
+    border-radius: 30px;
     transition: background-color 0.2s;
-    width: 48%;
 }
 
 .nav-btn:hover {
@@ -99,22 +88,6 @@ body {
 
 .nav-btn:focus {
     outline: none;
-}
-
-/* Back to Dashboard button */
-.back-btn button {
-    background-color: #1db954;
-    color: white;
-    border: none;
-    border-radius: 50px;
-    padding: 1rem 2rem;
-    font-size: 1.25rem; /* Match size with navigation buttons */
-    font-weight: 600;
-    transition: background-color 0.2s;
-}
-
-.back-btn button:hover {
-    background-color: #1aa34a;
 }
 
 /* Slide transitions */
@@ -142,50 +115,58 @@ body {
     cursor: pointer;
 }
 
-/* Responsive design for small screens */
+/* Responsive design */
 @media (max-width: 768px) {
     .wrap-container {
-        padding: 1rem;
+        padding: 15px;
     }
 
     .wrap-title {
-        font-size: 2.5rem;
-        margin-bottom: 1rem; /* Reduced margin for smaller screens */
+        font-size: 28px;
     }
 
     .section-title {
-        font-size: 1.5rem;
-        margin-bottom: 1rem;
+        font-size: 20px;
     }
 
     .track-item,
     .artist-item,
     .genre-item {
-        font-size: 1.125rem;
-    }
-
-    .nav-btn {
-        padding: 0.75rem 1.5rem;
-        font-size: 1.125rem;
-        width: 100%;
-    }
-
-    /* Adjust game info font size */
-    .game-info {
-        font-size: 1.125rem;
+        font-size: 16px;
     }
 }
 
-/* Mobile-first flexbox for genres */
 
+.game-info {
+    position: relative;
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+#timer-bar {
+    height: 10px;
+    width: 100%;
+    background-color: green;
+    transition: width 1s linear; /* Smooth width transition */
+    margin-top: 5px;
+}
+
+#timer {
+    font-weight: bold;
+}
+
+#score {
+    font-weight: bold;
+}
+
+/* Style for the container */
 .genre-list-container {
     display: flex;
-    flex-wrap: wrap;
-    gap: 1.5rem;
+    flex-wrap: wrap;  /* Allow stacking of items */
+    gap: 15px;
     justify-content: center;
-    padding-bottom: 1rem;
+    padding-bottom: 10px;
     position: relative;
-    width: 100%;
 }
 
 /* Style for each genre item */
@@ -194,12 +175,12 @@ body {
     text-align: center;
     background-color: #282828;
     color: #fff;
-    padding: 1rem;
+    padding: 10px;
     border-radius: 10px;
-    font-size: 1.25rem;
-    opacity: 0;
-    transform: translateY(50px);
-    animation: slideIn 0.6s forwards;
+    font-size: 18px;
+    opacity: 0;  /* Initially hidden */
+    transform: translateY(50px); /* Start from below */
+    animation: slideIn 0.6s forwards; /* Trigger animation */
 }
 
 /* Delay each genre item's animation */
@@ -218,51 +199,33 @@ body {
 .genre-item:nth-child(5) {
     animation-delay: 0.5s;
 }
+/* Add more delays as needed for more items */
 
-/* Slide-in animation */
+/* Define the slide-in animation */
 @keyframes slideIn {
     to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(0); /* Move to original position */
     }
 }
 
-/* Sliding effect for top artists and tracks */
-#top-artists-list,
-#top-tracks-list {
+/* For the sliding effect */
+#top-artists-list {
     display: flex;
     overflow: hidden;
     width: 100%;
 }
 
-.artist-item,
-.track-item {
-    opacity: 0;
-    transform: translateX(100%); /* Start off-screen */
+.artist-item {
+    margin-right: 10px; /* Adjust spacing between items */
+    opacity: 0; /* Initially hidden */
+    transform: translateX(100%); /* Initially offscreen */
     transition: opacity 0.5s ease, transform 0.5s ease; /* Smooth transition */
 }
 
-/* Animated state for active items */
-.artist-item.active,
-.track-item.active {
-    opacity: 1; /* Fully visible */
-    transform: translateX(0); /* Slide into position */
-}
-
-/* Style for the container of top tracks */
-#top-tracks-list {
-    display: flex;
-    overflow-x: auto;
-    scroll-behavior: smooth;
-    gap: 1rem;
-    padding-bottom: 1rem;
-}
-
-/* Style for the container of top artists */
-#top-artists-list {
-    display: flex;
-    gap: 1rem;
-    padding-bottom: 1rem;
+.artist-item.active {
+    opacity: 1; /* Fade-in */
+    transform: translateX(0); /* Slide-in */
 }
 
 /* Style for the container */
@@ -296,42 +259,213 @@ body {
     color: white;
     border: none;
     border-radius: 50px;
-    padding: 1rem 2rem;
-    font-size: 1.25rem; /* Match size with navigation buttons */
-    font-weight: 600;
-    transition: background-color 0.2s;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    margin-top: 20px;
 }
 
 .back-btn button:hover {
-    background-color: #1aa34a;
+    background-color: #1ed760; /* Lighter green on hover */
+    transform: scale(1.05); /* Slight scaling effect on hover */
 }
 
-/* Social media buttons */
+.back-btn button:focus {
+    outline: none;
+}
+
+/* Slide 1 animations */
+.slide-intro .section-title {
+    animation: fadeIn 1.5s ease-in-out forwards; /* Fade-in for the section title */
+    opacity: 0;
+}
+
+.slide-intro .track-list h2:first-child {
+    animation: bounceIn 1s ease-out forwards; /* Bounce effect for "It's Wrapped Time" */
+    opacity: 1; /* Ensure it stays visible */
+    transform: translateY(0); /* No movement after animation */
+}
+
+.slide-intro .track-list h2:last-child {
+    animation: zoomIn 1s ease-out forwards 1.5s; /* Increased delay for "Ready? Let's do this!" */
+    opacity: 0;
+    transform: scale(0.5);
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+/* Bounce-in animation */
+@keyframes bounceIn {
+    0% {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    60% {
+        transform: translateY(-20px);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1; /* Keep it visible after animation */
+    }
+}
+
+/* Zoom-in animation */
+@keyframes zoomIn {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Slide 3 animations */
+.slide-transition .section-title {
+    animation: fadeIn 1.5s ease-in-out forwards; /* Fade-in for the section title */
+    opacity: 0;
+}
+
+.slide-transition .track-list h3:first-child {
+    animation: bounceIn 1s ease-out forwards; /* Bounce effect for "YOUR TOP ARTIST WAS ..." */
+    opacity: 1; /* Ensure it stays visible */
+    transform: translateY(0); /* No movement after animation */
+}
+
+.slide-transition .track-list h3:last-child {
+    animation: zoomIn 1s ease-out forwards 1.5s; /* Increased delay for "BUT YOU HAD ROOM IN YOUR HEART ..." */
+    opacity: 0;
+    transform: scale(0.5);
+}
+
+/* Reuse the existing animations */
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes bounceIn {
+    0% {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    60% {
+        transform: translateY(-20px);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1; /* Keep it visible after animation */
+    }
+}
+
+@keyframes zoomIn {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Slide 5 animations */
+.slide-transition-genres .section-title {
+    animation: fadeIn 1.5s ease-in-out forwards; /* Fade-in for the section title */
+    opacity: 0;
+}
+
+.slide-transition-genres .track-list h3:first-child {
+    animation: bounceIn 1s ease-out forwards; /* Bounce effect for "This year was a feast for your ears" */
+    opacity: 1; /* Ensure it stays visible */
+    transform: translateY(0); /* No movement after animation */
+}
+
+.slide-transition-genres .track-list h3:last-child {
+    animation: zoomIn 1s ease-out forwards 1.5s; /* Increased delay for "Your top genre was ..." */
+    opacity: 0;
+    transform: scale(0.5);
+}
+
+/* Reuse the existing animations */
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes bounceIn {
+    0% {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    60% {
+        transform: translateY(-20px);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1; /* Keep it visible after animation */
+    }
+}
+
+@keyframes zoomIn {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.social-share-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+}
+
 .social-button {
-    background-color: #1db954;
-    color: white;
-    padding: 1rem 2rem;
-    border-radius: 50px;
-    font-size: 1.125rem;
-    text-decoration: none;
     display: inline-block;
-    margin: 0.5rem;
-    transition: background-color 0.3s;
+    margin: 10px;
+    padding: 10px 20px;
+    color: #fff; /* Default text color */
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 16px;
+    text-align: center;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.twitter-button {
+    background-color: black; /* Black background for Twitter */
+    border: 2px solid white; /* White border */
+    color: white; /* White text color */
+    transition: background-color 0.3s, color 0.3s; /* Smooth hover transition */
+}
+
+.facebook-button {
+    background-color: #3b5998;
+}
+
+.whatsapp-button {
+    background-color: #25D366;
 }
 
 .social-button:hover {
-    background-color: #1aa34a;
+    opacity: 0.8;
 }
-
-.social-button.facebook-button {
-    background-color: #1877f2;
-}
-
-.social-button.whatsapp-button {
-    background-color: #25d366;
-}
-
-.social-button.twitter-button {
-    background-color: #1da1f2;
-}
- 

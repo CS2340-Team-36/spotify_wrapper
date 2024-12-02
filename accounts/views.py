@@ -190,7 +190,7 @@ def create_wrapped(request):
 
         # Fetch top tracks and top artists based on the selected time frame
         top_tracks_url = f'https://api.spotify.com/v1/me/top/tracks?limit=10&time_range={term}'
-        top_artists_url = f'https://api.spotify.com/v1/me/top/artists?limit=10&time_range={term}'
+        top_artists_url = f'https://api.spotify.com/v1/me/top/artists?limit=5&time_range={term}'
 
         # Step 3: Try fetching top tracks and top artists
         top_tracks_response = requests.get(top_tracks_url, headers=headers)

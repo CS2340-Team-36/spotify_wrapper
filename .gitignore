@@ -1,6 +1,8 @@
 # Ignore .env file
 .env
 
+.DS_Store
+.cache
 # Other common ignores
 
 # Byte-compiled / optimized / DLL files

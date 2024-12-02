@@ -159,91 +159,91 @@ def refresh_access_token(refresh_token):
 
 @login_required
 def create_wrapped(request):
-    if not request.user.is_authenticated:
-        return JsonResponse({'error': 'User not authenticated'}, status=401)
-    
-    if request.method == 'POST':
-        # Step 1: Fetch Spotify data (replace with actual access token for authenticated user)
-        access_token = request.session.get('spotify_access_token')
-        refresh_token = request.session.get('spotify_refresh_token')  # Get the refresh token if available
-        if not access_token:
-            return JsonResponse({'error': 'No Spotify token found for the user. Please authenticate with Spotify.'}, status=401)
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
 
-        headers = {
-            'Authorization': f'Bearer {access_token}',
-        }
+    access_token = request.session.get('spotify_access_token')
+    refresh_token = request.session.get('spotify_refresh_token')
 
-        # Step 2: Determine the term (short_term, medium_term, long_term)
-        term = request.POST.get('term')
-        if term not in ['short_term', 'medium_term', 'long_term']:
-            return JsonResponse({'error': 'Invalid term specified. Must be one of: short_term, medium_term, long_term.'}, status=400)
-        
-        # Fetch top tracks and top artists based on the selected time frame
-        top_tracks_url = f'https://api.spotify.com/v1/me/top/tracks?limit=10&time_range={term}'
-        top_artists_url = f'https://api.spotify.com/v1/me/top/artists?limit=10&time_range={term}'
+    if not access_token:
+        return JsonResponse({'error': 'No Spotify token found. Please authenticate with Spotify.'}, status=401)
 
-        # Step 3: Try fetching top tracks and top artists
+    term = request.POST.get('term')
+    valid_terms = ['short_term', 'medium_term', 'long_term']
+    if term not in valid_terms:
+        return JsonResponse({'error': 'Invalid term specified.'}, status=400)
+
+    headers = {'Authorization': f'Bearer {access_token}'}
+    top_tracks_url = f'https://api.spotify.com/v1/me/top/tracks?limit=10&time_range={term}'
+    top_artists_url = f'https://api.spotify.com/v1/me/top/artists?limit=10&time_range={term}'
+
+    # Debugging Spotify API request
+    print(f"Access Token: {access_token}")
+    print(f"Top Tracks URL: {top_tracks_url}")
+    print(f"Headers: {headers}")
+
+    # Fetch top tracks and artists
+    top_tracks_response = requests.get(top_tracks_url, headers=headers)
+    top_artists_response = requests.get(top_artists_url, headers=headers)
+
+    if top_tracks_response.status_code == 401:
+        print("Access token expired, attempting refresh.")
+        new_access_token = refresh_spotify_token(refresh_token)
+        if not new_access_token:
+            return JsonResponse({'error': 'Failed to refresh Spotify token.'}, status=500)
+
+        request.session['spotify_access_token'] = new_access_token
+        headers['Authorization'] = f'Bearer {new_access_token}'
+
+        # Retry the API requests with the new token
         top_tracks_response = requests.get(top_tracks_url, headers=headers)
         top_artists_response = requests.get(top_artists_url, headers=headers)
 
-        # Check for token expiration
-        if top_tracks_response.status_code == 401 and 'expired' in top_tracks_response.text:
-            # Token expired, try refreshing it
-            new_access_token = refresh_spotify_token(refresh_token)
-            if not new_access_token:
-                return JsonResponse({'error': 'Error refreshing Spotify token.'}, status=500)
-            
-            # Save the new access token in the session
-            request.session['spotify_access_token'] = new_access_token
-            headers['Authorization'] = f'Bearer {new_access_token}'  # Update the headers with the new access token
+    # Handle errors from Spotify API
+    if top_tracks_response.status_code != 200:
+        print(f"Top Tracks Error: {top_tracks_response.status_code}, {top_tracks_response.text}")
+        return JsonResponse({'error': 'Error fetching top tracks from Spotify API.'},
+                            status=top_tracks_response.status_code)
 
-            # Retry the API requests with the new token
-            top_tracks_response = requests.get(top_tracks_url, headers=headers)
-            top_artists_response = requests.get(top_artists_url, headers=headers)
+    if top_artists_response.status_code != 200:
+        print(f"Top Artists Error: {top_artists_response.status_code}, {top_artists_response.text}")
+        return JsonResponse({'error': 'Error fetching top artists from Spotify API.'},
+                            status=top_artists_response.status_code)
 
-        if top_tracks_response.status_code != 200:
-            return JsonResponse({'error': 'Error fetching top tracks from Spotify API.'}, status=500)
-        if top_artists_response.status_code != 200:
-            return JsonResponse({'error': 'Error fetching top artists from Spotify API.'}, status=500)
+    # Process the data
+    top_tracks_data = top_tracks_response.json()
+    top_artists_data = top_artists_response.json()
 
-        # Step 4: Process the data
-        top_tracks_data = top_tracks_response.json()  # Parse the JSON response for top tracks
-        top_artists_data = top_artists_response.json()  # Parse the JSON response for top artists
+    if not top_tracks_data.get('items') or not top_artists_data.get('items'):
+        return JsonResponse({'error': 'No top tracks or artists found.'}, status=404)
 
-        if not top_tracks_data.get('items') or not top_artists_data.get('items'):
-            return JsonResponse({'error': 'No top tracks or artists found.'}, status=404)
+    top_tracks = process_top_tracks(top_tracks_data)
+    top_artists = process_top_artists(top_artists_data)
+    top_genres = process_top_genres(access_token, term)
 
-        top_tracks = process_top_tracks(top_tracks_data)
-        top_artists = process_top_artists(top_artists_data)
+    # Generate LLM description
+    try:
+        llm_description = generate_personality_description(top_artists, top_genres, top_tracks)
+    except Exception as e:
+        print(f"LLM Generation Error: {str(e)}")
+        llm_description = "Could not generate description. Error occurred."
 
-        # Collect all the genres (pass the term for time-range)
-        top_genres = process_top_genres(access_token, term)
-
-        try:
-            llm_description = generate_personality_description(top_artists, top_genres, top_tracks)
-        except Exception as e:
-            llm_description = "Could not generate description. Error occurred."
-
-        # Step 5: Save the wrap data to the database
-        try:
-            wrap_name = f"{term.replace('_', ' ').title()} Wrap {UserSpotifyData.objects.filter(user=request.user, term=term).count() + 1}"
-            wrap = UserSpotifyData.objects.create(
-                user=request.user,
-                wrap_name=wrap_name,
-                top_tracks=top_tracks_data,
-                top_artists=top_artists_data,
-                term=term,
-                top_genres=top_genres,
-                llm_description=llm_description,
-            )
-            #print(wrap.llm_description)
-            return JsonResponse({'success': f'{wrap_name} created successfully.'})
-
-        except Exception as e:
-            return JsonResponse({'error': f'Error saving wrap: {str(e)}'}, status=500)
-
-    else:
-        return JsonResponse({'error': 'Invalid request method'}, status=405)
+    # Save the wrap
+    try:
+        wrap_name = f"{term.replace('_', ' ').title()} Wrap {UserSpotifyData.objects.filter(user=request.user, term=term).count() + 1}"
+        wrap = UserSpotifyData.objects.create(
+            user=request.user,
+            wrap_name=wrap_name,
+            top_tracks=top_tracks_data,
+            top_artists=top_artists_data,
+            term=term,
+            top_genres=top_genres,
+            llm_description=llm_description,
+        )
+        return JsonResponse({'success': f'{wrap_name} created successfully.'})
+    except Exception as e:
+        print(f"Database Save Error: {str(e)}")
+        return JsonResponse({'error': 'Error saving wrap data.'}, status=500)
 
 
 def refresh_spotify_token(refresh_token):

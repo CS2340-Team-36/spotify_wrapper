@@ -83,7 +83,7 @@ python manage.py runserver
 [Python-url]: https://www.python.org/
 
 ## Links:
-1. Team Website: 
+1. Team Website: https://ananyapattamatta7.wixstudio.com/team36
 2. GitHub Repository: https://github.com/CS2340-Team-36/spotify_wrapper
 3. Kanban Board: https://trello.com/b/PjyDzB6w/2340-project-2-team-36
 

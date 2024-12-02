@@ -12,4 +12,5 @@ urlpatterns = [
     path('create_wrapped/', views.create_wrapped, name='create_wrapped'),
     path('wrap/<int:wrap_id>/', views.wrap_detail, name='wrap_detail'),
     path('contact/', views.contact_page, name='contact_page'),
+    path('delete-wrap/<int:wrap_id>/', views.delete_wrap, name='delete_wrap'),
 ]

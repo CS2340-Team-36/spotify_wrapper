@@ -12,20 +12,24 @@
 </head>
 <body>
     <div class="wrap-container">
+        <!-- button to go back to dashboard -->
+        <a href="http://localhost:8000/accounts/dashboard/" class="back-btn">
+            <button type="button">Back to Dashboard</button>
+        </a>
         <!-- Theme toggle button -->
         <!-- <button id="toggle-theme" class="theme-toggle-btn">Toggle Light Mode</button> -->
 
         <h1 class="wrap-title">{{ wrap_name }}</h1>
-
         <div id="slides" class="slides-container">
             <!-- Slide 1: Intro -->
-            <div class="slide active">
-                <h2 class="section-title">Hey {{user.username}}</h2>
+            <div class="slide slide-intro active">
+                <h2 class="section-title">Hey {{ user.username }}</h2>
                 <ul class="track-list">
-                    <h2>Its Wrapped Time</h2>
-                    <h2>Ready? Lets do this!</h2>
+                    <h2>It's Wrapped Time</h2>
+                    <h2>Ready? Let's do this!</h2>
                 </ul>
             </div>
+            
             <!-- Slide 2: Top Tracks -->
             <div class="slide active">
                 <h2 class="section-title">Top Tracks</h2>
@@ -40,7 +44,7 @@
             </div>
 
             <!-- Slide 3: Transition to Top Artists -->
-            <div class="slide active">
+            <div class="slide slide-transition active">
                 <h2 class="section-title">YOUR TOP ARTIST WAS {{top_artists.0.name}}</h2>
                 <ul class="track-list">
                     <h3>BUT YOU HAD ROOM IN YOUR HEART FOR MORE THAN ONE...</h3>
@@ -58,7 +62,7 @@
             </div>
 
             <!-- Slide 5: Transition to Top Genres -->
-            <div class="slide active">
+            <div class="slide slide-transition-genres active">
                 <h2 class="section-title">This year was a feast for your ears</h2>
                 <ul class="track-list">
                     <h3>Your top genre was {{top_genres.0}}</h3>
@@ -120,7 +124,35 @@
                 </p>
             </div>
 
-                            
+        <!-- Slide 9: Share Your Wrapped -->
+        <div class="slide">
+          <h2 class="section-title">Share Your Wrapped</h2>
+          <p>Share your music wrapped with your friends!</p>
+          <div class="social-share-buttons">
+            <!-- Facebook Share Button -->
+            <a
+              href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri|urlencode }}"
+              target="_blank"
+              class="social-button facebook-button"
+              >Share on Facebook</a
+            >
+
+            <!-- WhatsApp Share Button -->
+            <a
+              href="https://api.whatsapp.com/send?text={{ request.build_absolute_uri|urlencode }}"
+              target="_blank"
+              class="social-button whatsapp-button"
+              >Share on WhatsApp</a
+            >
+
+            <!-- Twitter Share Button -->
+            <a
+              href="https://twitter.com/intent/tweet?text={{ wrap_name|urlencode }}%20-%20Check%20out%20my%20music%20Wrapped!%20%23MyMusicWrapped&url={{ request.build_absolute_uri|urlencode }}"
+              target="_blank"
+              class="social-button twitter-button"
+            >Share on X</a>
+          </div>
+        </div>
 
             <!-- Add more slides here as needed -->
         </div>

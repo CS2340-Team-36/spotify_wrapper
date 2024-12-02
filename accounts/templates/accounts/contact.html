@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -123,16 +124,19 @@
 </head>
 <body>
     <div class="contact-container">
+
         <div class="mb-3">
             <a href="{% url 'dashboard' %}" class="btn btn-secondary">&larr; Back to Dashboard</a>
         </div>
         <h1>Contact the Developers</h1>
         <hr style="width: 100%; border-color: #444;">
 
+
         <!-- Contact Form -->
         <h2>Send Us Feedback</h2>
         <form method="POST" action="{% url 'contact_page' %}" class="contact-form">
             {% csrf_token %}
+
             <input type="text" class="form-control" id="name" name="name" placeholder="Name" required>
             <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
             <textarea class="form-control" id="description" name="description" rows="5" placeholder="Description" required></textarea>

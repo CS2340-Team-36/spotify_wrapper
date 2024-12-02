@@ -1,6 +1,6 @@
 /* Global styles to match Spotify's dark theme */
 body {
-    font-family: 'Helvetica Neue', sans-serif;
+    font-family: 'Inter', sans-serif; /* Better font for readability */
     background-color: #121212;
     color: white;
     margin: 0;
@@ -9,50 +9,58 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
+    overflow: hidden; /* Prevent scrolling on body */
 }
 
 /* Centering the wrap container */
 .wrap-container {
     width: 100%;
-    max-width: 800px;
-    padding: 20px;
+    max-width: 900px;
+    padding: 2rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    box-sizing: border-box;
 }
 
+/* Title styling (Name should be the biggest) */
 .wrap-title {
-    font-size: 36px;
-    font-weight: 700;
+    font-size: 3rem; /* Make the name the largest */
+    font-weight: 900; /* Boldest weight for the name */
     text-align: center;
     color: #1db954;
-    margin-bottom: 20px;
+    margin-bottom: 1rem; /* Reduced space between title and slide content */
 }
 
+/* Slide container margin */
 #slides {
-    margin-top: 30px;
+    margin-top: 1.5rem; /* Reduced margin to decrease the space */
 }
 
+/* Section titles */
 .section-title {
-    font-size: 24px;
+    font-size: 1.75rem;
     font-weight: 600;
     color: #b3b3b3;
-    margin-bottom: 10px;
+    margin-bottom: 1.5rem;
 }
 
+/* Lists (Tracks, Artists, Genres) */
 .track-list,
 .artist-list,
-.genre-list { /* Added genre list styling */
+.genre-list {
     list-style: none;
     padding: 0;
+    margin: 0;
 }
 
 .track-item,
 .artist-item,
-.genre-item { /* Added genre item styling */
-    font-size: 18px;
-    margin-bottom: 15px;
+.genre-item {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    word-wrap: break-word; /* Ensure text doesn't overflow */
 }
 
 .track-name {
@@ -64,6 +72,7 @@ body {
     color: #b3b3b3;
 }
 
+/* Navigation buttons (Back to Dashboard, Previous, Next) */
 .nav-buttons {
     display: flex;
     justify-content: center;
@@ -83,7 +92,6 @@ body {
     border-radius: 30px;
     transition: background-color 0.2s ease;
     text-align: center;
-
 }
 
 .nav-btn:hover {
@@ -134,24 +142,26 @@ body {
     cursor: pointer;
 }
 
-/* Responsive design */
+/* Responsive design for small screens */
 @media (max-width: 768px) {
     .wrap-container {
-        padding: 15px;
+        padding: 1rem;
     }
 
     .wrap-title {
-        font-size: 28px;
+        font-size: 2.5rem;
+        margin-bottom: 1rem; /* Reduced margin for smaller screens */
     }
 
     .section-title {
-        font-size: 20px;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
     }
 
     .track-item,
     .artist-item,
     .genre-item {
-        font-size: 16px;
+        font-size: 1.125rem;
     }
 }
 
@@ -185,18 +195,16 @@ body {
     font-weight: bold;
 }
 
-#score {
-    font-weight: bold;
-}
+/* Mobile-first flexbox for genres */
 
-/* Style for the container */
 .genre-list-container {
     display: flex;
-    flex-wrap: wrap;  /* Allow stacking of items */
-    gap: 15px;
+    flex-wrap: wrap;
+    gap: 1.5rem;
     justify-content: center;
-    padding-bottom: 10px;
+    padding-bottom: 1rem;
     position: relative;
+    width: 100%;
 }
 
 /* Style for each genre item */
@@ -205,12 +213,12 @@ body {
     text-align: center;
     background-color: #282828;
     color: #fff;
-    padding: 10px;
+    padding: 1rem;
     border-radius: 10px;
-    font-size: 18px;
-    opacity: 0;  /* Initially hidden */
-    transform: translateY(50px); /* Start from below */
-    animation: slideIn 0.6s forwards; /* Trigger animation */
+    font-size: 1.25rem;
+    opacity: 0;
+    transform: translateY(50px);
+    animation: slideIn 0.6s forwards;
 }
 
 /* Delay each genre item's animation */
@@ -229,27 +237,27 @@ body {
 .genre-item:nth-child(5) {
     animation-delay: 0.5s;
 }
-/* Add more delays as needed for more items */
 
-/* Define the slide-in animation */
+/* Slide-in animation */
 @keyframes slideIn {
     to {
         opacity: 1;
-        transform: translateY(0); /* Move to original position */
+        transform: translateY(0);
     }
 }
 
-/* For the sliding effect */
-#top-artists-list {
+/* Sliding effect for top artists and tracks */
+#top-artists-list,
+#top-tracks-list {
     display: flex;
     overflow: hidden;
     width: 100%;
 }
 
-.artist-item {
-    margin-right: 10px; /* Adjust spacing between items */
-    opacity: 0; /* Initially hidden */
-    transform: translateX(100%); /* Initially offscreen */
+.artist-item,
+.track-item {
+    opacity: 0;
+    transform: translateX(100%); /* Start off-screen */
     transition: opacity 0.5s ease, transform 0.5s ease; /* Smooth transition */
 }
 

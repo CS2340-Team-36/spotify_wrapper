@@ -23,11 +23,14 @@ Spotify Wrapped is a web application that allows users to explore and interact w
 ### D. Mobile-Friendly UI
 - The website is designed to be responsive and works well on both desktop and mobile devices.
 
-### E. Dark Mode & Theme Customization
-- Users can toggle a dark mode for the entire UI.
-
-### F. Social Media Sharing
+### E. Social Media Sharing
 - Users can easily share their Spotify Wrapped on social media platforms like Instagram, LinkedIn, and X (formerly Twitter).
+
+### F. Personalized description
+- Users get a personalized description about themselves based on their listening history.
+
+### G. Animated Transitions
+- Users can view their wraps with crisp transitions and animations for an enhanced experience.
 
 
 ## Project Setup
@@ -47,9 +50,13 @@ git clone https://github.com/CS2340-Team-36/spotify_wrapper.git
 pip install -r requirements.txt
 ```
 
-3. Set up environment variables (such as the Spotify API key) in your .env file:
+3. Set up environment variable in your .env file:
 ```sh
-SPOTIFY_API_KEY=your_api_key
+SPOTIFY_SECRET_KEY=your_api_key
+SPOTIFY_CLIENT_ID=your_client_id
+SPOTIFY_REDIRECT_URI=your_uri
+GENIUS_API_KEY="your_api_key"
+LLM_API_KEY=your_api_key
 ```
 
 4. Run migrations to set up the database:

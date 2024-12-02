@@ -40,13 +40,34 @@
             margin-bottom: 20px;
         }
 
-        a {
-            color: #1db954;
-            text-decoration: none;
+        .top-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
         }
 
-        a:hover {
-            text-decoration: underline;
+        .top-buttons button {
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            padding: 5px 10px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .top-buttons button:hover {
+            background-color: #1db954;
+            color: #fff;
+            transform: scale(1.05);
+        }
+
+        .top-buttons button:active {
+            background-color: #148d3e;
+            transform: scale(1);
         }
 
         .wraps-container {
@@ -148,11 +169,21 @@
 
     <div class="dashboard-container">
         <h2>Welcome to Your Dashboard</h2>
-        <div class="mb-4">
-            <a href="{% url 'logout' %}">Logout</a> |
-            <a href="{% url 'delete_account' %}" onclick="return confirm('Are you sure you want to delete your account?');">Delete Account</a> |
-            <a href="{% url 'spotify_login' %}">Login with Spotify</a> |
-            <a href="{% url 'contact_page' %}">Contact Developers</a>
+        <div class="top-buttons">
+            <form method="POST" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit">Logout</button>
+            </form>
+            <form method="POST" action="{% url 'delete_account' %}">
+                {% csrf_token %}
+                <button type="submit" onclick="return confirm('Are you sure you want to delete your account?');">Delete Account</button>
+            </form>
+            <form method="GET" action="{% url 'spotify_login' %}">
+                <button type="submit">Login with Spotify</button>
+            </form>
+            <form method="GET" action="{% url 'contact_page' %}">
+                <button type="submit">Contact Developers</button>
+            </form>
         </div>
 
         <h3>Create Wrapped for Timeframe</h3>

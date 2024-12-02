@@ -177,6 +177,7 @@ body {
 }
 
 /* Mobile-first flexbox for genres */
+
 .genre-list-container {
     display: flex;
     flex-wrap: wrap;
@@ -262,6 +263,27 @@ body {
     display: flex;
     gap: 1rem;
     padding-bottom: 1rem;
+}
+
+/* Style for the container */
+#top-tracks-list {
+    display: flex;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    width: 100%;
+}
+
+/* Initial state for each track item */
+.track-item {
+    opacity: 0; /* Initially invisible */
+    transform: translateX(100%); /* Positioned offscreen to the right */
+    transition: opacity 0.5s ease, transform 0.5s ease; /* Smooth fade and slide transition */
+}
+
+/* Animated state */
+.track-item.active {
+    opacity: 1; /* Fully visible */
+    transform: translateX(0); /* Slide into view */
 }
 
 /* Button to match Spotify theme */

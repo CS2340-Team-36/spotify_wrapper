@@ -164,6 +164,7 @@ def create_wrapped(request):
         return JsonResponse({'error': 'User not authenticated'}, status=401)
     
     if request.method == 'POST':
+        
         # Step 1: Fetch Spotify data (replace with actual access token for authenticated user)
         access_token = request.session.get('spotify_access_token')
         refresh_token = request.session.get('spotify_refresh_token')  # Get the refresh token if available
@@ -176,9 +177,17 @@ def create_wrapped(request):
 
         # Step 2: Determine the term (short_term, medium_term, long_term)
         term = request.POST.get('term')
+        confirmed = request.POST.get('confirmed') == 'true'  # Check if the request is confirmed
+
         if term not in ['short_term', 'medium_term', 'long_term']:
             return JsonResponse({'error': 'Invalid term specified. Must be one of: short_term, medium_term, long_term.'}, status=400)
         
+        existing_wrap = UserSpotifyData.objects.filter(user=request.user, term=term).first()
+        if existing_wrap and not confirmed:
+            return JsonResponse({
+                'warning': f"You already have a wrap for {term.replace('_', ' ')}. Are you sure you want to create another?"
+            }, status=200)
+
         # Fetch top tracks and top artists based on the selected time frame
         top_tracks_url = f'https://api.spotify.com/v1/me/top/tracks?limit=10&time_range={term}'
         top_artists_url = f'https://api.spotify.com/v1/me/top/artists?limit=10&time_range={term}'
